@@ -36,6 +36,18 @@
         <header-file src="src/ios/DataExchangerDevice.h" target-dir="DxPlugin" />
         <source-file src="src/ios/DataExchangerDevice.m" target-dir="DxPlugin" />
 
+        <header-file src="src/ios/BLEController.h" target-dir="DxPlugin" />
+        <header-file src="src/ios/BLEControllerDeviceProtocol.h" target-dir="DxPlugin" />
+        <header-file src="src/ios/BLEDevice.h" target-dir="DxPlugin" />
+        <header-file src="src/ios/BLEDeviceAppDelegateProtocol.h" target-dir="DxPlugin" />
+        <header-file src="src/ios/BLEDeviceProfileProtocol.h" target-dir="DxPlugin" />
+        <header-file src="src/ios/BLELib.h" target-dir="DxPlugin" />
+        <header-file src="src/ios/DataExchangerProfile.h" target-dir="DxPlugin" />
+        <header-file src="src/ios/DataExchangerProfileProtocol.h" target-dir="DxPlugin" />
+
+        <!-- libraries -->
+        <source-file src="src/ios/libblelib.a" framework="true" />
+
         <!-- frameworks -->
         <framework src="CoreBluetooth.framework" />
 
