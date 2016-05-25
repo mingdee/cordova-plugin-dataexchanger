@@ -42,6 +42,7 @@
         <header-file src="src/ios/BLEDeviceAppDelegateProtocol.h" target-dir="DxPlugin" />
         <header-file src="src/ios/BLEDeviceProfileProtocol.h" target-dir="DxPlugin" />
         <header-file src="src/ios/BLELib.h" target-dir="DxPlugin" />
+        <header-file src="src/ios/BLEProfile.h" target-dir="DxPlugin" />
         <header-file src="src/ios/DataExchangerProfile.h" target-dir="DxPlugin" />
         <header-file src="src/ios/DataExchangerProfileProtocol.h" target-dir="DxPlugin" />
 
