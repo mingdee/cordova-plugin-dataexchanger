@@ -60,91 +60,91 @@ module.exports =
 {
     startScan: function (success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'startScan', []);
+        cordova.exec(success, failure, 'DxPlugin', 'startScan', []);
     },
 
     startScanAndConnect: function( success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'startScanAndConnect', []);
+        cordova.exec(success, failure, 'DxPlugin', 'startScanAndConnect', []);
     },
                
     stopScan: function (success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'stopScan', []);
+        cordova.exec(success, failure, 'DxPlugin', 'stopScan', []);
     },
 
     connect: function (devUUIDStr, success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'connect', [devUUIDStr]);
+        cordova.exec(success, failure, 'DxPlugin', 'connect', [devUUIDStr]);
     },
 
     disconnect: function (devUUIDStr, success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'disconnect', [devUUIDStr]);
+        cordova.exec(success, failure, 'DxPlugin', 'disconnect', [devUUIDStr]);
     },
 
     // characteristic value comes back as ArrayBuffer in the success callback
     sendData: function (devUUIDStr, data, success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'sendData', [devUUIDStr, data]);
+        cordova.exec(success, failure, 'DxPlugin', 'sendData', [devUUIDStr, data]);
     },
 
     // RSSI value comes back as an integer
     sendCmd: function(devUUIDStr, data, success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'sendCmd', [devUUIDStr, data]);
+        cordova.exec(success, failure, 'DxPlugin', 'sendCmd', [devUUIDStr, data]);
     },
 
     // value must be an ArrayBuffer
     readTxCredit: function (devUUIDStr, success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'readTxCredit', [devUUIDStr]);
+        cordova.exec(success, failure, 'DxPlugin', 'readTxCredit', [devUUIDStr]);
     },
 
     // value must be an ArrayBuffer
     writeTxCreditReportLoopCount: function (devUUIDStr, count, success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'writeTxCreditReportLoopCount', [devUUIDStr, count]);
+        cordova.exec(success, failure, 'DxPlugin', 'writeTxCreditReportLoopCount', [devUUIDStr, count]);
     },
 
     isConnected: function (devUUIDStr, success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'isConnected', [devUUIDStr]);
+        cordova.exec(success, failure, 'DxPlugin', 'isConnected', [devUUIDStr]);
     },
 
     isEnabled: function (success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'isEnabled', []);
+        cordova.exec(success, failure, 'DxPlugin', 'isEnabled', []);
     },
                
     enableRxDataNotification: function (success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'enableRxDataNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'enableRxDataNotification', []);
     },
 
     disableRxDataNotification: function (success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'disableRxDataNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'disableRxDataNotification', []);
     },
 
     enableRxCmdNotification: function (success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'enableRxCmdNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'enableRxCmdNotification', []);
     },
                
     disableRxCmdNotification: function (success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'disableRxCmdNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'disableRxCmdNotification', []);
     },
 
     enableTxCreditNotification: function (success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'enableTxCreditNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'enableTxCreditNotification', []);
     },
                
     disableTxCreditNotification: function (success, failure)
     {
-        cordova.exec(success, failure, 'DATAEXCHANGER', 'disableTxCreditNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'disableTxCreditNotification', []);
     },
 
 };
