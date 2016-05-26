@@ -5,7 +5,7 @@
     id="cordova-plugin-dataexchanger"
     version="1.0.0">
 
-    <name>DATAEXCHANGER</name>
+    <name>DxPlugin</name>
     <description>DataExchanger Plugin</description>
     <license>Apache 2.0</license>
     <keywords>bluetooth, BLE, bluetooth low energy, bluetooth smart, DataExchanger, dataexchanger, data exchanger, DX, dx</keywords>
@@ -15,15 +15,15 @@
 
     <dependency id="cordova-plugin-compat" version="^1.0.0" />
 
-    <js-module src="www/dx.js" name="dataexchanger">
-        <clobbers target="dx" />
+    <js-module src="www/dx.js" name="Dx">
+        <clobbers target="window.dx" />
     </js-module>
 
     <platform name="ios">
 
-        <config-file target="config.xml" parent="/widget">
-            <feature name="DATAEXCHANGER">
-                <param name="ios-package" value="DxPlugin" onload="true"/>
+        <config-file target="config.xml" parent="/*">
+            <feature name="DxPlugin">
+                <param name="ios-package" value="DxPlugin"/>
             </feature>
         </config-file>
 
