@@ -274,6 +274,13 @@
     }
     else if( [cmd isEqualToString:@"RxData"] && callbacks[@"RxData"] )
     {
+#if 1 // <<- put 1 here to disable packet alignment
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"data":usrInfo[@"Data"],
+                                                                            @"info":usrInfo[@"DevInfo"]}];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[@"RxData"]];
+#else
         static NSMutableData* queue = nil;
         
         if( queue == nil )
@@ -326,6 +333,7 @@
                 }
             }
         }
+#endif
     }
     else if( [cmd isEqualToString:@"RxCmd"] && callbacks[@"RxCmd"] )
     {
