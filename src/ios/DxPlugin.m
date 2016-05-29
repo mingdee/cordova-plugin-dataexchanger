@@ -274,19 +274,113 @@
     }
     else if( [cmd isEqualToString:@"RxData"] && callbacks[@"RxData"] )
     {
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"data":usrInfo[@"Data"],
-                                                                            @"info":usrInfo[@"DevInfo"]}];
-        [pluginResult setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[@"RxData"]];
+        static NSMutableData* queue = nil;
+        
+        if( queue == nil )
+        {
+            queue = [NSMutableData data];
+        }
+        
+        NSData* data = usrInfo[@"Data"];
+        
+        if( data.length > 0 )
+        {
+            [queue appendData:data];
+            NSString* queueStr = [[NSString alloc] initWithData:queue encoding:NSASCIIStringEncoding];
+            NSArray* subStrs = [queueStr componentsSeparatedByString:@"\r\n"];
+            NSString* printStr = [queueStr stringByReplacingOccurrencesOfString:@"\r" withString:@"\\r"];
+            printStr = [printStr stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
+            
+            NSLog(@"[INFO] RxData Queue: %@", printStr);
+            
+            if( subStrs.count > 1 )
+            {
+                NSUInteger __block bytePassed = 0;
+                
+                [subStrs enumerateObjectsUsingBlock:^(NSString*  _Nonnull subStr, NSUInteger idx, BOOL * _Nonnull stop) {
+                    if( (idx + 1) < subStrs.count )
+                    {
+                        NSLog(@"[INFO]: RxData: %@", subStr);
+                        NSString* str = [subStr stringByAppendingString:@"\r\n"];
+                        bytePassed += str.length;
+                        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                      messageAsDictionary:@{@"data":[str dataUsingEncoding:NSUTF8StringEncoding],
+                                                                                            @"info":usrInfo[@"DevInfo"]}];
+                        [pluginResult setKeepCallbackAsBool:YES];
+                        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[@"RxData"]];
+                    }
+                    else
+                    {
+                        NSLog(@"[INFO]: RxData: residue %@", subStr);
+                        *stop = YES;
+                    }
+                }];
+                
+                if( queue.length <= bytePassed )
+                {
+                    queue = nil;
+                }
+                else
+                {
+                    queue = [[NSMutableData alloc] initWithBytes:(queue.bytes + bytePassed) length:(queue.length - bytePassed)];
+                }
+            }
+        }
     }
     else if( [cmd isEqualToString:@"RxCmd"] && callbacks[@"RxCmd"] )
     {
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"data":usrInfo[@"Data"],
-                                                                            @"info":usrInfo[@"DevInfo"]}];
-        [pluginResult setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[@"RxCmd"]];
+        static NSMutableData* queue = nil;
+        
+        if( queue == nil )
+        {
+            queue = [NSMutableData data];
+        }
+        
+        NSData* data = usrInfo[@"Data"];
+        
+        if( data.length > 0 )
+        {
+            [queue appendData:data];
+            NSString* queueStr = [[NSString alloc] initWithData:queue encoding:NSASCIIStringEncoding];
+            NSArray* subStrs = [queueStr componentsSeparatedByString:@"\r\n"];
+            NSString* printStr = [queueStr stringByReplacingOccurrencesOfString:@"\r" withString:@"\\r"];
+            printStr = [printStr stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
+            
+            //NSLog(@"[INFO] RxCmd Queue: %@", printStr);
+            
+            if( subStrs.count > 1 )
+            {
+                NSUInteger __block bytePassed = 0;
+                
+                [subStrs enumerateObjectsUsingBlock:^(NSString*  _Nonnull subStr, NSUInteger idx, BOOL * _Nonnull stop) {
+                    if( (idx + 1) < subStrs.count )
+                    {
+                        //NSLog(@"[INFO]: RxCmd: %@", subStr);
+                        NSString* str = [subStr stringByAppendingString:@"\r\n"];
+                        bytePassed += str.length;
+                        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                      messageAsDictionary:@{@"data":[str dataUsingEncoding:NSUTF8StringEncoding],
+                                                                                            @"info":usrInfo[@"DevInfo"]}];
+                        [pluginResult setKeepCallbackAsBool:YES];
+                        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[@"RxCmd"]];
+                    }
+                    else
+                    {
+                        //NSLog(@"[INFO]: RxCmd: residue %@", subStr);
+                        *stop = YES;
+                    }
+                }];
+                
+                if( queue.length <= bytePassed )
+                {
+                    queue = nil;
+                }
+                else
+                {
+                    queue = [[NSMutableData alloc] initWithBytes:(queue.bytes + bytePassed) length:(queue.length - bytePassed)];
+                }
+            }
+        }
     }
     else if( [cmd isEqualToString:@"TxCredit"] && callbacks[@"TxCredit"] )
     {
