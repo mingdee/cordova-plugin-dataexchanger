@@ -22,6 +22,16 @@
 
 @interface DataExchangerDevice : BLEDevice
 
+// Proximity connecting
+@property (nonatomic, readwrite)       BOOL                proximityConnecting;
+
+// Proximity minimum power level
+@property (nonatomic, readwrite)       float               minPowerLevel;
+
+// Discovery active timeout
+@property (nonatomic, readwrite)       NSTimeInterval      discoveryActiveTimeout;
+
+
 + (DataExchangerDevice*) deviceWithAppDelegate:(id<DataExchangerDeviceAppDelegateProtocol>)delegate;
 
 - (BOOL) sendData:(NSData*)data;

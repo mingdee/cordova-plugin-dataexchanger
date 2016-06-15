@@ -80,6 +80,9 @@ enum BLEScanDevicePolicy
 // to scan for the GATT services which are associated with the BLE device.
 - (void) registerDevice:(BLEDevice*)device;
 
+- (BOOL) connectDevice:(NSUUID*)uuid;
+
+- (BOOL) disconnectDevice:(NSUUID*)uuid;
 
 @end
 

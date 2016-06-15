@@ -89,6 +89,8 @@ typedef enum
 //
 - (NSInteger) evaluateDeviceMatchingScoreBasedOnAdvertisingData:(NSDictionary*)adv rssi:(NSNumber*)rssi deviceName:(NSString*)name;
 
+- (NSInteger) evaluateDeviceMatchingScoreBasedOnAdvertisingData:(NSDictionary*)adv rssi:(NSNumber*)rssi deviceUUID:(CBUUID*)uuid;
+
 //
 // This method will manually connect to the discovered device if autoConnect has not
 // been set.
@@ -179,6 +181,8 @@ typedef enum
 // before issuing Device:allProfileIsReady:.
 //
 - (void) profile:(BLEProfile*)profile isReady:(BOOL)isReady;
+
+- (CBPeripheral*) centralPeripheral;
 
 //
 // These methods collect and manage the primary service UUIDs.

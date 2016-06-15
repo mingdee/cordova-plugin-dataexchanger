@@ -7,27 +7,33 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "BLEDeviceAppDelegateProtocol.h"
+#import "DataExchangerDevice.h"
 #import "DataExchangerProfileProtocol.h"
 
-@interface DxAppSC : NSObject <BLEDeviceAppDelegateProtocol, DataExchangerProfileProtocol>
+@interface DxAppSC : NSObject <DataExchangerDeviceAppDelegateProtocol, DataExchangerProfileProtocol>
 
 @property (nonatomic, assign)   BOOL        enableTxCreditNoti;
 
 + (DxAppSC*)controller;
 
+
+- (id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval)timeout;
+
+- (BOOL) isEnabled;
+
 - (void) startScan;
 - (void) stopScan;
+- (BOOL) isScanning;
 
-- (bool) connect:(NSUUID*)uuid;
-- (bool) disconnect:(NSUUID*)uuid;
+- (BOOL) connectDevice:(NSUUID*)uuid;
+- (BOOL) disconnectDevice:(NSUUID*)uuid;
+- (NSUInteger) connectedDeviceCount;
+- (BOOL) isDeviceConnected:(NSUUID*)uuid;
+- (BOOL) isDeviceActive:(NSUUID*)uuid;
 
 - (BOOL) sendData:(NSData*)data;
 - (BOOL) sendCmd:(NSData*)data;
 - (BOOL) readTxCredit;
 - (BOOL) writeTxCreditReportLoopCount:(uint32_t)count;
-
-- (BOOL) isEnabled;
-- (BOOL) isConnected;
 
 @end

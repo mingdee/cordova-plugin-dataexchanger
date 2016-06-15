@@ -14,13 +14,18 @@
 
 @interface DataExchangerDevice()
 
-@property id<DataExchangerDeviceAppDelegateProtocol> discoveryDelegate;
+@property id<DataExchangerDeviceAppDelegateProtocol>    discoveryDelegate;
+@property NSTimer*                                      discActTimer;
 
 @end
 
 @implementation DataExchangerDevice
 
 @synthesize discoveryDelegate;
+@synthesize proximityConnecting;
+@synthesize minPowerLevel;
+@synthesize discActTimer;
+@synthesize discoveryActiveTimeout;
 
 + (DataExchangerDevice*) deviceWithAppDelegate:(id<DataExchangerDeviceAppDelegateProtocol>)delegate
 {
@@ -32,7 +37,22 @@
     return dev;
 }
 
-- (NSInteger) evaluateDeviceMatchingScoreBasedOnAdvertisingData:(NSDictionary *)adv rssi:(NSNumber *)rssi deviceName:(NSString *)name
+- (id) initWithAppDelegate:(id<DataExchangerDeviceAppDelegateProtocol>)delegate
+{
+    self = [super initWithAppDelegate:delegate];
+    if( self == nil )
+    {
+        return nil;
+    }
+    
+    proximityConnecting = NO;
+    minPowerLevel = -127;
+    discoveryActiveTimeout = 5.0;
+    
+    return self;
+}
+
+- (NSInteger) evaluateDeviceMatchingScoreBasedOnAdvertisingData:(NSDictionary*)adv rssi:(NSNumber*)rssi deviceUUID:(CBUUID*)uuid
 {
     // Insert your code here to make decision whether you should connect or not.
     //
@@ -73,22 +93,53 @@
         return -1;
     }
     
-    NSLog(@"INFO: Peripheral[%@] discovered [RSSI=%@]", name, rssi);
-#if 1
-    if ( [rssi floatValue] > 0 ||    // filter some bogus value sometime received from iOS
-         [rssi floatValue] < -45 )
+    NSLog(@"INFO: Peripheral[%@] discovered [RSSI=%@]", [uuid UUIDString], rssi);
+    
+    if ( [rssi floatValue] > 0 )    // filter some bogus value sometime received from iOS
     {
         return -1;
     }
-#endif
     
-#if 0
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [discoveryDelegate Device:self active:YES parameters:@{@"RSSI"];
-    });
-#endif
-         
+    if( discoveryDelegate && !self.autoConnect )
+    {
+        NSDictionary* params = @{@"RSSI":rssi,
+                                 @"CBUUID":uuid,
+                                 @"ADV":adv};
+        
+        //NSLog(@"[INFO] Advertising: %@", adv);
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [discoveryDelegate Device:self active:YES parameters:params];
+
+            if( discActTimer )
+            {
+                [discActTimer invalidate];
+                discActTimer = nil;
+            }
+            
+            discActTimer = [NSTimer scheduledTimerWithTimeInterval:discoveryActiveTimeout
+                                                            target:self
+                                                          selector:@selector(discoveryActiveTimerExpired:)
+                                                          userInfo:params
+                                                           repeats:NO];
+        });
+        
+    }
+    
+    // Proximity connecting
+    // - reject if enabled and is below the minimum power level
+    if( proximityConnecting && [rssi floatValue] < minPowerLevel )
+    {
+        return -1;
+    }
+    
     return 0;
+}
+
+- (void) discoveryActiveTimerExpired:(NSTimer*)timer
+{
+    discActTimer = nil;
+    [discoveryDelegate Device:self active:NO parameters:timer.userInfo];
 }
 
 

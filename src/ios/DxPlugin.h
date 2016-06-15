@@ -25,8 +25,9 @@
 {
 }
 
+- (void)isEnabled:(CDVInvokedUrlCommand *)command;
+
 - (void)startScan:(CDVInvokedUrlCommand *)command;
-- (void)startScanAndConnect:(CDVInvokedUrlCommand *)command;
 - (void)stopScan:(CDVInvokedUrlCommand *)command;
 
 - (void)connect:(CDVInvokedUrlCommand *)command;
@@ -35,7 +36,6 @@
 - (void)sendData:(CDVInvokedUrlCommand *)command;
 - (void)sendCmd:(CDVInvokedUrlCommand *)command;
 
-- (void)isEnabled:(CDVInvokedUrlCommand *)command;
 - (void)isConnected:(CDVInvokedUrlCommand *)command;
 
 - (void)readTxCredit:(CDVInvokedUrlCommand *)command;
