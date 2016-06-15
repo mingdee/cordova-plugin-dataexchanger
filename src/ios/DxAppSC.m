@@ -208,7 +208,8 @@ static DxAppSC* gController = nil;
                                                                          @"UUID":[cbUUID UUIDString],
                                                                          @"NAME":name,
                                                                          @"CONNECTABLE":params[@"ADV"][@"kCBAdvDataIsConnectable"],
-                                                                         @"TXPWR":params[@"ADV"][@"kCBAdvDataTxPowerLevel"]
+                                                                         @"TXPWR":params[@"ADV"][@"kCBAdvDataTxPowerLevel"],
+                                                                         @"RSSI":params[@"RSSI"]
                                                                          },
                                                                  }];
 }
