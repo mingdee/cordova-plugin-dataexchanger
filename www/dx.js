@@ -1,4 +1,4 @@
-// (c) 2016 GT-tronics Canada Ltd
+cordova.define("cordova-plugin-dataexchanger.Dx", function(require, exports, module) { // (c) 2016 GT-tronics Canada Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,16 +58,16 @@ function convertToNativeJS(object)
 
 module.exports =
 {
+    init: function(devCount, proximityPowerLevel, discoveryActiveTimeout, success, failure)
+    {
+        cordova.exec(success, failure, 'DxPlugin', 'init', [devCount, proximityPowerLevel, discoveryActiveTimeout]);
+    },
+               
     startScan: function (success, failure)
     {
         cordova.exec(success, failure, 'DxPlugin', 'startScan', []);
     },
 
-    startScanAndConnect: function( success, failure)
-    {
-        cordova.exec(success, failure, 'DxPlugin', 'startScanAndConnect', []);
-    },
-               
     stopScan: function (success, failure)
     {
         cordova.exec(success, failure, 'DxPlugin', 'stopScan', []);
@@ -117,34 +117,36 @@ module.exports =
         cordova.exec(success, failure, 'DxPlugin', 'isEnabled', []);
     },
                
-    enableRxDataNotification: function (success, failure)
+    enableRxDataNotification: function (devUUIDStr, success, failure)
     {
-        cordova.exec(success, failure, 'DxPlugin', 'enableRxDataNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'enableRxDataNotification', [devUUIDStr]);
     },
 
-    disableRxDataNotification: function (success, failure)
+    disableRxDataNotification: function (devUUIDStr, success, failure)
     {
-        cordova.exec(success, failure, 'DxPlugin', 'disableRxDataNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'disableRxDataNotification', [devUUIDStr]);
     },
 
-    enableRxCmdNotification: function (success, failure)
+    enableRxCmdNotification: function (devUUIDStr, success, failure)
     {
-        cordova.exec(success, failure, 'DxPlugin', 'enableRxCmdNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'enableRxCmdNotification', [devUUIDStr]);
     },
                
-    disableRxCmdNotification: function (success, failure)
+    disableRxCmdNotification: function (devUUIDStr, success, failure)
     {
-        cordova.exec(success, failure, 'DxPlugin', 'disableRxCmdNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'disableRxCmdNotification', [devUUIDStr]);
     },
 
-    enableTxCreditNotification: function (success, failure)
+    enableTxCreditNotification: function (devUUIDStr, success, failure)
     {
-        cordova.exec(success, failure, 'DxPlugin', 'enableTxCreditNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'enableTxCreditNotification', [devUUIDStr]);
     },
                
-    disableTxCreditNotification: function (success, failure)
+    disableTxCreditNotification: function (devUUIDStr, success, failure)
     {
-        cordova.exec(success, failure, 'DxPlugin', 'disableTxCreditNotification', []);
+        cordova.exec(success, failure, 'DxPlugin', 'disableTxCreditNotification', [devUUIDStr]);
     },
 
 };
+
+});
