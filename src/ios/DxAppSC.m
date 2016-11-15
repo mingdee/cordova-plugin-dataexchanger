@@ -8,10 +8,13 @@
 
 #import "DxAppSC.h"
 #import "BLEController.h"
+#import "DataExchangerDevice.h"
 #import "DataExchangerProfile.h"
+#import "DxAppFirmLogStateMachine.h"
 
 static NSString* const kDevNameDX      = @"DataExchanger";
 static DxAppSC* gController = nil;
+
 
 @interface DxAppSC ()
 
@@ -21,6 +24,8 @@ static DxAppSC* gController = nil;
 @property (nonatomic, strong)   NSMutableDictionary*            activeDevices;
 @property (nonatomic, strong)   NSMutableDictionary*            connectedDevices;
 @property (nonatomic, strong)   NSMutableSet*                   allDevices;
+
+@property (nonatomic, strong)   NSMutableDictionary*            firmLogSMs;
 
 @end
 
@@ -32,18 +37,22 @@ static DxAppSC* gController = nil;
 @synthesize activeDevices;
 @synthesize connectedDevices;
 @synthesize allDevices;
+@synthesize firmLogSMs;
 
 + (DxAppSC*)controller
 {
     if( gController == nil )
     {
-        gController = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:-127 discoveryActiveTimeout:5.0];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        BOOL enable = [defaults boolForKey:@"enableCmdCh"];
+
+        gController = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:-127 discoveryActiveTimeout:5.0 autoConnect:YES enableCommandChannel:enable enableTransmitBackPressure:YES];
     }
     
     return gController;
 }
 
-- (id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval)timeout
+- (id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval) timeout autoConnect:(BOOL)autoConnect enableCommandChannel:(BOOL)enableCmdCh enableTransmitBackPressure:(BOOL)enableTxCredit
 {
     self = [super init];
     if( self == nil )
@@ -54,6 +63,7 @@ static DxAppSC* gController = nil;
     activeDevices = [@{} mutableCopy];
     connectedDevices = [@{} mutableCopy];
     allDevices = [NSMutableSet set];
+    firmLogSMs = [@{} mutableCopy];
     
     //
     // Initialize BLE controller, device, and profile. Please follow these steps:
@@ -74,8 +84,9 @@ static DxAppSC* gController = nil;
         // 2. Create DataExchanger device
         device = [DataExchangerDevice deviceWithAppDelegate:self];
         device.devName = [NSString stringWithString:kDevNameDX];
-        device.autoConnect = NO;
+        device.autoConnect = autoConnect;
         device.discoveryActiveTimeout = timeout;
+        
         if( pwrLevel <= -127 )
         {
             device.proximityConnecting = NO;
@@ -91,7 +102,10 @@ static DxAppSC* gController = nil;
         }
         
         // 3. Create DataExchanger profile
-        BLEProfile* dxp = [DataExchangerProfile profileWithDevice:device andAppDelegate:self];
+        DataExchangerProfile* dxp = (DataExchangerProfile*)[DataExchangerProfile profileWithDevice:device andAppDelegate:self];
+        
+        dxp.enableRx2Noti = enableCmdCh;
+        dxp.enableTxCreditNoti = enableTxCredit;
         
         // 4. Add DataExchanger profile in DataExchanger device
         [device addProfile:dxp];
@@ -147,6 +161,17 @@ static DxAppSC* gController = nil;
     return d ?YES :NO;
 }
 
+// Legacy API
+- (BOOL) isConnected
+{
+    if( device == nil )
+    {
+        return NO;
+    }
+    
+    return device.state == BLE_DEVICE_CONNECTED;
+}
+
 - (NSUInteger) connectedDeviceCount
 {
     return connectedDevices.count;
@@ -164,23 +189,251 @@ static DxAppSC* gController = nil;
 
 - (BOOL) sendData:(NSData *)data
 {
+    if( device == nil )
+    {
+        return NO;
+    }
+    
     return [device sendData:data];
 }
 
-- (BOOL) sendCmd:(NSData *)data
+- (BOOL) sendData:(NSData*)data toDevice:(NSUUID*)uuid
 {
-    return [device sendCmd:data];
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [d sendData:data];
+}
+
+- (BOOL) sendCmd:(NSData*)data
+{
+    if( device == nil )
+    {
+        return NO;
+    }
+    
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[device.devUUID UUIDString]];
+    DxAppFirmLogStateMachine* sm = firmLogSMs[devUUID];
+    
+    if( sm.state != STATE_IDLE )
+    {
+        return NO;
+    }
+    
+    return [device sendCmd:data withResponse:YES];
+}
+
+- (BOOL) sendCmd:(NSData*)data toDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+
+    if( ((DxAppFirmLogStateMachine*)firmLogSMs[uuid]).state != STATE_IDLE )
+    {
+        return NO;
+    }
+    
+    return [d sendCmd:data withResponse:YES];
+}
+
+- (BOOL) enableCmd:(BOOL)enabled
+{
+    if( device == nil )
+    {
+        return NO;
+    }
+    
+    return [device enableCmd:enabled];
+}
+
+- (BOOL) enableCmd:(BOOL)enabled onDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [d enableCmd:enabled];
 }
 
 - (BOOL) readTxCredit
 {
+    if( device == nil )
+    {
+        return NO;
+    }
+    
     return [device readTxCredit];
+}
+
+- (BOOL) readTxCreditFromDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [d readTxCredit];
 }
 
 - (BOOL) writeTxCreditReportLoopCount:(uint32_t)count
 {
+    if( device == nil )
+    {
+        return NO;
+    }
+    
     return [device writeTxCreditReportLoopCount:count];
 }
+
+- (BOOL) writeTxCreditReportLoopCount:(uint32_t)count inDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [d writeTxCreditReportLoopCount:count];
+}
+
+// Retrieve meta data from data logger
+- (BOOL) retrieveDataLoggerMetaWithCompletion:(nullable void (^) (NSDictionary* metas, NSError* err))completeHandler
+{
+    if( device == nil )
+    {
+        return NO;
+    }
+    
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[device.devUUID UUIDString]];
+    DxAppFirmLogStateMachine* sm = firmLogSMs[devUUID];
+    
+    return [sm retrieveDataLoggerMetaWithCompletion:completeHandler fromDevice:device];
+}
+
+- (BOOL) retrieveDataLoggerMetaWithCompletion:(nullable void (^) (NSDictionary* metas, NSError* err))completeHandler fromDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [firmLogSMs[uuid] retrieveDataLoggerMetaWithCompletion:completeHandler fromDevice:d];
+}
+
+// Retrieve data from data logger
+- (BOOL) retrieveDataLoggerDataUsingMetas:(NSDictionary*)metas metaKey:(NSString*)key flush:(BOOL)isFlush completion:(nullable void (^) (NSData* data, NSError* err))completeHandler
+{
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[device.devUUID UUIDString]];
+    DxAppFirmLogStateMachine* sm = firmLogSMs[devUUID];
+    
+    return [sm retrieveDataLoggerDataWithMetas:metas metaKey:key flush:isFlush completion:completeHandler fromDevice:device];
+}
+
+- (BOOL) retrieveDataLoggerDataUsingMetas:(NSDictionary*)metas metaKey:(NSString*)key flush:(BOOL)isFlush completion:(nullable void (^) (NSData* data, NSError* err))completeHandler fromDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [firmLogSMs[uuid] retrieveDataLoggerDataWithMetas:metas metaKey:key flush:isFlush completion:completeHandler fromDevice:d];
+}
+
+
+// Retrieve firmware meta
+- (BOOL) retrieveFirmwareMetaWithProgress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(void (^)(NSDictionary*, NSError *))completeHandler
+{
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[device.devUUID UUIDString]];
+    DxAppFirmLogStateMachine* sm = firmLogSMs[devUUID];
+    
+    return [sm retrieveFirmwareMetaWithProgress:progressHandler complete:completeHandler fromDevice:device];
+}
+
+- (BOOL) retrieveFirmwareMetaWithProgress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(void (^)(NSDictionary*, NSError *))completeHandler fromDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [firmLogSMs[uuid] retrieveFirmwareMetaWithProgress:progressHandler complete:completeHandler fromDevice:d];
+}
+
+
+// Write firmware image
+- (BOOL) writeFirmwareImageInSlot:(uint8_t)slotIdx firmwareData:(NSData*)firmData scratchPad:(NSData*)scratchPad progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete: (nullable void (^) (NSDictionary* metas, NSError* err))completeHandler
+{
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[device.devUUID UUIDString]];
+    DxAppFirmLogStateMachine* sm = firmLogSMs[devUUID];
+    
+    return [sm writeFirmwareImageInSlot:slotIdx firmwareData:firmData scratchPad:scratchPad progress:progressHandler complete:completeHandler inDevice:device];
+}
+
+- (BOOL) writeFirmwareImageInSlot:(uint8_t)slotIdx firmwareData:(NSData*)firmData scratchPad:(NSData*)scratchPad progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete: (nullable void (^) (NSDictionary* metas, NSError* err))completeHandler inDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [firmLogSMs[uuid] writeFirmwareImageInSlot:slotIdx firmwareData:firmData scratchPad:scratchPad progress:progressHandler complete:completeHandler inDevice:d];
+}
+
+
+// Delete firmware meta
+- (BOOL) deleteFirmwareImageFromSlot:(uint8_t)slotIdx progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete: (nullable void (^) (NSDictionary* metas, NSError* err))completeHandler
+{
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[device.devUUID UUIDString]];
+    DxAppFirmLogStateMachine* sm = firmLogSMs[devUUID];
+    
+    return [sm deleteFirmwareImageFromSlot:slotIdx progress:progressHandler complete:completeHandler inDevice:device];
+}
+
+- (BOOL) deleteFirmwareImageFromSlot:(uint8_t)slotIdx progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete: (nullable void (^) (NSDictionary* metas, NSError* err))completeHandler inDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [firmLogSMs[uuid] deleteFirmwareImageFromSlot:slotIdx progress:progressHandler complete:completeHandler inDevice:d];
+}
+
+- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx
+{
+    if( device == nil )
+    {
+        return NO;
+    }
+    
+    return [self _switchFirmwareImageToSlot:slotIdx inDevice:device];
+}
+
+- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx inDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    
+    return [self _switchFirmwareImageToSlot:slotIdx inDevice:d];
+}
+
+- (BOOL) _switchFirmwareImageToSlot:(uint8_t)slotIdx inDevice:(DataExchangerDevice*)d
+{
+    NSString* cmdStr = [NSString stringWithFormat:@"AT+IMG=%u\r\n", slotIdx];
+    BOOL success = [d sendCmd:[cmdStr dataUsingEncoding:NSUTF8StringEncoding] withResponse:YES];
+    NSLog(@"[INFO] Firmware: %@", cmdStr);
+    
+    return success;
+}
+
 
 #pragma mark -
 #pragma mark - DataExchangerDeviceAppDelegateProtocol methods
@@ -200,6 +453,14 @@ static DxAppSC* gController = nil;
     {
         name = nameFromAdv;
     }
+    
+    NSNumber* txPwrNum = @999;
+    NSNumber* txPwrNumFromAdv = params[@"ADV"][@"kCBAdvDataTxPowerLevel"];
+    if( txPwrNumFromAdv )
+    {
+        txPwrNum = txPwrNumFromAdv;
+    }
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
                                                         object:nil
                                                       userInfo:@{
@@ -208,7 +469,7 @@ static DxAppSC* gController = nil;
                                                                          @"UUID":[cbUUID UUIDString],
                                                                          @"NAME":name,
                                                                          @"CONNECTABLE":params[@"ADV"][@"kCBAdvDataIsConnectable"],
-                                                                         @"TXPWR":params[@"ADV"][@"kCBAdvDataTxPowerLevel"],
+                                                                         @"TXPWR":txPwrNum,
                                                                          @"RSSI":params[@"RSSI"]
                                                                          },
                                                                  }];
@@ -217,7 +478,7 @@ static DxAppSC* gController = nil;
 // This member function is called when the device is discovered and
 // connected or is disconnected. This function is called before
 // Device:allProfilesReady:.
-- (void) Device:(BLEDevice*)d switchOn:(BOOL)flag
+- (void) Device:(DataExchangerDevice*)d switchOn:(BOOL)flag
 {
     //
     // Receive notification of device status change
@@ -232,7 +493,7 @@ static DxAppSC* gController = nil;
         //
         // Device is disconnected.
         //
- 
+
         connectedDevices[devUUID] = nil;
         activeDevices[devUUID] = nil;
 
@@ -244,6 +505,9 @@ static DxAppSC* gController = nil;
                                                                                     @"UUID":[d.devUUID UUIDString]
                                                                                  }
                                                                     }];
+                                                          
+        [firmLogSMs[devUUID] notifyDeviceOff];
+        firmLogSMs[devUUID] = nil;
     }
     else
     {
@@ -253,6 +517,7 @@ static DxAppSC* gController = nil;
         //
 
         connectedDevices[devUUID] = d;
+        firmLogSMs[devUUID] = [[DxAppFirmLogStateMachine alloc] init];
         
         // This is to ensure the active device stored is the same device here
         activeDevices[devUUID] = d;
@@ -263,14 +528,14 @@ static DxAppSC* gController = nil;
                                                                      @"Command":@"DeviceOn",
                                                                      @"DevInfo":@{
                                                                                     @"UUID":[d.devUUID UUIDString]
-                                                                                }
+                                                                                 }
                                                                      }];
     }
 }
 
 // This member function is called when all profiles declared ready
 // At this point, you are sure the device can function in all aspects
-- (void) Device:(BLEDevice*)d allProfilesReady:(BOOL)isReady
+- (void) Device:(DataExchangerDevice*)d allProfilesReady:(BOOL)isReady
 {
     if( isReady )
     {
@@ -296,7 +561,7 @@ static DxAppSC* gController = nil;
 }
 
 // This function is called when RSSI reading is enabled.
-- (void) Device:(BLEDevice*)device reportRssi:(NSNumber *)rssi
+- (void) Device:(BLEDevice*)d reportRssi:(NSNumber *)rssi
 {
     //
     // Recieve new RSSI reading
@@ -325,29 +590,50 @@ static DxAppSC* gController = nil;
                                                                  }];
 }
 
-- (void) Device:(BLEDevice*)d DidWriteWithError:(NSError*)error
+- (void) Device:(DataExchangerDevice*)d DidWriteWithError:(NSError*)error
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
-                                                        object:nil
-                                                      userInfo:@{@"Command":@"DidSend",
-                                                                 @"Error":error == nil ?[NSNull null] :error,
-                                                                 @"DevInfo":@{
-                                                                                @"UUID":[d.devUUID UUIDString]
-                                                                             }
-                                                                 }];
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[d.devUUID UUIDString]];
 
+    if( [firmLogSMs[devUUID] processDidWriteWithError:error fromDevice:d] )
+    {
+        NSDictionary* usrInfo;
+        
+        if( error )
+        {
+            usrInfo = @{@"Command":@"DidSend",
+                        @"DevInfo":@{
+                                        @"UUID":[d.devUUID UUIDString]
+                                    },
+                        @"Error":error};
+        }
+        else
+        {
+            usrInfo = @{@"Command":@"DidSend",
+                        @"DevInfo":@{
+                                        @"UUID":[d.devUUID UUIDString]
+                                    }};
+        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
+                                                            object:nil
+                                                          userInfo:usrInfo];
+    }
 }
 
-- (void) Device:(BLEDevice *)d Rx2Data:(NSData *)data
+- (void) Device:(DataExchangerDevice*)d Rx2Data:(NSData *)data
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
-                                                        object:nil
-                                                      userInfo:@{@"Command":@"RxCmd",
-                                                                 @"Data":data,
-                                                                 @"DevInfo":@{
-                                                                                @"UUID":[d.devUUID UUIDString]
-                                                                             }
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[d.devUUID UUIDString]];
+
+    if( [firmLogSMs[devUUID] processRx2Data:data fromDevice:d] )
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
+                                                            object:nil
+                                                          userInfo:@{@"Command":@"RxCmd",
+                                                                     @"Data":data,
+								     @"DevInfo":@{
+                                                                                     @"UUID":[d.devUUID UUIDString]
+                                                                             	 }
                                                                  }];
+    }
 }
 
 - (void) Device:(BLEDevice *)d TxCredit:(UInt32)credits
@@ -360,6 +646,11 @@ static DxAppSC* gController = nil;
                                                                                 @"UUID":[d.devUUID UUIDString]
                                                                              }
                                                                  }];
+}
+
+- (uint16_t) crc16CalcOnData:(uint8_t *)data length:(NSUInteger)len
+{
+    return [DxAppFirmLogStateMachine crc16CalcOnData:data length:len];
 }
 
 @end

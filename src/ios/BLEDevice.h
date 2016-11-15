@@ -5,7 +5,7 @@
 //  Created by Ming Leung on 12-07-16.
 //  Copyright (c) 2012 GT-Tronics HK Ltd. All rights reserved.
 //
-//  $Rev: 39 $
+//  $Rev: 51 $
 //
 
 #ifndef __BLEDEVICE_H__
@@ -112,6 +112,7 @@ typedef enum
 // Characteristic UUID.
 //
 - (BOOL) writeValue:(NSData*)data forCharacteristic:(CBUUID*)cuuid andService:(CBUUID*)suuid;
+- (BOOL) writeValue:(NSData*)data forCharacteristic:(CBUUID*)cuuid andService:(CBUUID*)suuid withResponse:(BOOL)withResponse;
 
 //
 // This method issues a read request to an attribute specified by Service UUID and

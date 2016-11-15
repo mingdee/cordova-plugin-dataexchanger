@@ -37,8 +37,10 @@ Edit config.xml to install the plugin for [PhoneGap Build](http://build.phonegap
 
 - [dx.isEnabled](#isenabled)
 - [dx.isConnected](#isconnected)
-- [dx.startScanAndConnect](#startscanandconnect)
+- [dx.startScan](#startscan)
 - [dx.stopScan](#stopscan)
+- [dx.connect](#connect)
+- [dx.disconnect](#disconnect)
 - [dx.sendData](#senddata)
 - [dx.sendCmd](#sendcmd)
 - [dx.startRxDataNotification](#startrxdatanotification)

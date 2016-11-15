@@ -5,7 +5,7 @@
 //  Created by Ming Leung on 12-07-16.
 //  Copyright (c) 2012 GT-Tronics HK Ltd. All rights reserved.
 //
-//  $Rev: 38 $
+//  $Rev: 50 $
 //
 // BLEController class (together with BLEDevice and BLEProfile classes)
 // abstracts the CoreBluetooth framework to provide a class-based

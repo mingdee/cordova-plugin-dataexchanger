@@ -14,10 +14,10 @@
 
 @property (nonatomic, assign)   BOOL        enableTxCreditNoti;
 
-+ (DxAppSC*)controller;
++ (nullable DxAppSC*)controller;
 
 
-- (id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval)timeout;
+- (nullable id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval) timeout autoConnect:(BOOL)autoConnect enableCommandChannel:(BOOL)enableCmdCh enableTransmitBackPressure:(BOOL)enableTxCredit;
 
 - (BOOL) isEnabled;
 
@@ -25,15 +25,46 @@
 - (void) stopScan;
 - (BOOL) isScanning;
 
-- (BOOL) connectDevice:(NSUUID*)uuid;
-- (BOOL) disconnectDevice:(NSUUID*)uuid;
+- (BOOL) connectDevice:(nonnull NSUUID*)uuid;
+- (BOOL) disconnectDevice:(nonnull NSUUID*)uuid;
 - (NSUInteger) connectedDeviceCount;
-- (BOOL) isDeviceConnected:(NSUUID*)uuid;
-- (BOOL) isDeviceActive:(NSUUID*)uuid;
+- (BOOL) isDeviceConnected:(nonnull NSUUID*)uuid;
+- (BOOL) isDeviceActive:(nonnull NSUUID*)uuid;
+- (BOOL) isConnected; // legacy API
 
-- (BOOL) sendData:(NSData*)data;
-- (BOOL) sendCmd:(NSData*)data;
+- (BOOL) sendData:(nonnull NSData*)data;
+- (BOOL) sendData:(nonnull NSData*)data toDevice:(nonnull NSUUID*)uuid;
+
+- (BOOL) sendCmd:(nonnull NSData*)data;
+- (BOOL) sendCmd:(nonnull NSData*)data toDevice:(nonnull NSUUID*)uuid;
+
+- (BOOL) enableCmd:(BOOL)enabled;
+- (BOOL) enableCmd:(BOOL)enabled onDevice:(nonnull NSUUID*)uuid;
+
 - (BOOL) readTxCredit;
+- (BOOL) readTxCreditFromDevice:(nonnull NSUUID*)uuid;
+
 - (BOOL) writeTxCreditReportLoopCount:(uint32_t)count;
+- (BOOL) writeTxCreditReportLoopCount:(uint32_t)count inDevice:(nonnull NSUUID*)uuid;
+
+- (BOOL) retrieveDataLoggerMetaWithCompletion:(nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler;
+- (BOOL) retrieveDataLoggerMetaWithCompletion:(nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler fromDevice:(nonnull NSUUID*)uuid;
+
+- (BOOL) retrieveDataLoggerDataUsingMetas:(nonnull NSDictionary*)metas metaKey:(nonnull NSString*)key flush:(BOOL)isFlush completion:(nullable void (^) (NSData* _Nullable data, NSError* _Nullable err))completeHandler;
+- (BOOL) retrieveDataLoggerDataUsingMetas:(nonnull NSDictionary*)metas metaKey:(nonnull NSString*)key flush:(BOOL)isFlush completion:(nullable void (^) (NSData* _Nullable data, NSError* _Nullable err))completeHandler fromDevice:(nonnull NSUUID*)uuid;
+
+- (BOOL) retrieveFirmwareMetaWithProgress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler;
+- (BOOL) retrieveFirmwareMetaWithProgress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler fromDevice:(nonnull NSUUID*)uuid;
+
+- (BOOL) writeFirmwareImageInSlot:(uint8_t)slotIdx firmwareData:(nonnull NSData*)firmData scratchPad:(nullable NSData*)scratchPad progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler;
+- (BOOL) writeFirmwareImageInSlot:(uint8_t)slotIdx firmwareData:(nonnull NSData*)firmData scratchPad:(nullable NSData*)scratchPad progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler inDevice:(nonnull NSUUID*)uuid;
+
+- (BOOL) deleteFirmwareImageFromSlot:(uint8_t)slotIdx progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete: (nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler;
+- (BOOL) deleteFirmwareImageFromSlot:(uint8_t)slotIdx progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete: (nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler inDevice:(nonnull NSUUID*)uuid;
+
+- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx;
+- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx inDevice:(nonnull NSUUID*)uuid;
+
+- (uint16_t) crc16CalcOnData:(nonnull uint8_t*)data length:(NSUInteger)len;
 
 @end

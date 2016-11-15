@@ -33,6 +33,7 @@
         <header-file src="src/ios/DxAppSC.h" target-dir="DxPlugin" />
         <source-file src="src/ios/DxAppSC.m" target-dir="DxPlugin" />
 
+        <header-file src="src/ios/DxAppFirmLogStateMachine.h" target-dir="DxPlugin" />
         <header-file src="src/ios/DataExchangerDevice.h" target-dir="DxPlugin" />
         <source-file src="src/ios/DataExchangerDevice.m" target-dir="DxPlugin" />
 
@@ -48,6 +49,7 @@
 
         <!-- libraries -->
         <source-file src="src/ios/libblelib.a" framework="true" />
+        <source-file src="src/ios/libDxAppFirmLogStateMachine.a" framework="true" />
 
         <!-- frameworks -->
         <framework src="CoreBluetooth.framework" />

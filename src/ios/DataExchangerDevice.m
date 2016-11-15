@@ -162,7 +162,7 @@
     return NO;
 }
 
-- (BOOL) sendCmd:(NSData*)data
+- (BOOL) sendCmd:(NSData*)data withResponse:(BOOL)response
 {
     if( self.state != BLE_DEVICE_CONNECTED )
     {
@@ -175,7 +175,26 @@
     {
         if( [profile isMemberOfClass:[DataExchangerProfile class]] )
         {
-            return [(DataExchangerProfile*)profile sendTx2:data];
+            return [(DataExchangerProfile*)profile sendTx2:data withResponse:response];
+        }
+    }
+    return NO;
+}
+
+- (BOOL) enableCmd:(BOOL)enabled
+{
+    if( self.state != BLE_DEVICE_CONNECTED )
+    {
+        return NO;
+    }
+    
+    NSSet* profiles = [self listRegisteredProfile];
+    
+    for( BLEProfile* profile in profiles )
+    {
+        if( [profile isMemberOfClass:[DataExchangerProfile class]] )
+        {
+            return [(DataExchangerProfile*)profile enableRx2Notification:enabled];
         }
     }
     return NO;

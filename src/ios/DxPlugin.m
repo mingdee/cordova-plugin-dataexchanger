@@ -59,8 +59,11 @@
         NSUInteger devCount = command.arguments.count > 0 ?[[command.arguments objectAtIndex:0] integerValue] :1;
         float pwrLevel = command.arguments.count > 1 ?[[command.arguments objectAtIndex:1] floatValue] :-127.0;
         NSTimeInterval timeout = command.arguments.count > 2 ?[[command.arguments objectAtIndex:2] doubleValue] :5.0;
-
-        sc = [[DxAppSC alloc] initWithDeviceCount:devCount proximityPowerLevel:pwrLevel discoveryActiveTimeout:timeout];
+        BOOL autoConnect = command.arguments.count > 3 ?[[command.arguments objectAtIndex:3] boolValue] :NO;
+        BOOL enableCmdChannel = command.arguments.count > 4 ?[[command.arguments objectAtIndex:4] boolValue] :NO;
+        BOOL enableTxCredit = command.arguments.count > 5 ?[[command.arguments objectAtIndex:5] boolValue] :NO;
+        
+        sc = [[DxAppSC alloc] initWithDeviceCount:devCount proximityPowerLevel:pwrLevel discoveryActiveTimeout:timeout autoConnect:autoConnect enableCommandChannel:enableCmdChannel enableTransmitBackPressure:enableTxCredit];
         
         callbacks = [@{} mutableCopy];
         

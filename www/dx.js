@@ -1,4 +1,4 @@
-cordova.define("cordova-plugin-dataexchanger.Dx", function(require, exports, module) { // (c) 2016 GT-tronics Canada Ltd
+// (c) 2016 GT-tronics Canada Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,9 +58,9 @@ function convertToNativeJS(object)
 
 module.exports =
 {
-    init: function(devCount, proximityPowerLevel, discoveryActiveTimeout, success, failure)
+    init: function(devCount, proximityPowerLevel, discoveryActiveTimeout, autoConnect, enableCommandChannel, enableTransmitBackpressure, success, failure)
     {
-        cordova.exec(success, failure, 'DxPlugin', 'init', [devCount, proximityPowerLevel, discoveryActiveTimeout]);
+        cordova.exec(success, failure, 'DxPlugin', 'init', [devCount, proximityPowerLevel, discoveryActiveTimeout, autoConnect, enableCommandChannel, enableTransmitBackpressure]);
     },
                
     startScan: function (success, failure)
@@ -148,5 +148,3 @@ module.exports =
     },
 
 };
-
-});

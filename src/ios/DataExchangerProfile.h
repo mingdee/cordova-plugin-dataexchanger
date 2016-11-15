@@ -5,7 +5,7 @@
 //  Created by Ming Leung on 12-12-12.
 //  Copyright (c) 2012 GT-Tronics HK Ltd. All rights reserved.
 //
-//  $Rev: 46 $
+//  $Rev: 51 $
 //
 
 
@@ -15,13 +15,11 @@
 extern NSString* const kDXServiceUUID;
 extern NSString* const kDXI2cSetupUUID;
 
-#define DX_SERV_ENABLE_UART     0x1
-#define DX_SERV_ENABLE_I2C      0x2
-
 @interface DataExchangerProfile : BLEProfile
 
 @property (nonatomic, weak)   id<DataExchangerProfileProtocol>      appDelegate;
-@property (nonatomic, assign) NSUInteger                            whichServEnabled;
+@property (nonatomic, assign) BOOL                                  enableRx2Noti;
+@property (nonatomic, assign) BOOL                                  enableTxCreditNoti;
 
 //
 //Init
@@ -51,6 +49,7 @@ extern NSString* const kDXI2cSetupUUID;
 // - deprecated. Use sendTx:
 //
 - (BOOL) sendTx2:(NSData*)data;
+- (BOOL) sendTx2:(NSData*)data withResponse:(BOOL)response;
 
 //
 // This method will enable/disable Rx2 port notification of the connected BLE device

@@ -35,7 +35,8 @@
 + (DataExchangerDevice*) deviceWithAppDelegate:(id<DataExchangerDeviceAppDelegateProtocol>)delegate;
 
 - (BOOL) sendData:(NSData*)data;
-- (BOOL) sendCmd:(NSData*)data;
+- (BOOL) sendCmd:(NSData*)data withResponse:(BOOL)response;
+- (BOOL) enableCmd:(BOOL)enabled;
 - (BOOL) enableTxCreditNotification:(BOOL)enabled;
 - (BOOL) readTxCredit;
 - (BOOL) writeTxCreditReportLoopCount:(uint32_t)count;
