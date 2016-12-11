@@ -12,8 +12,9 @@
 typedef enum
 {
     STATE_IDLE = 0,
-    STATE_FIRM_VERSIONS,
+    STATE_FIRM_READ_FLASH_SZ,
     STATE_FIRM_READ_META,
+    STATE_FIRM_VERSIONS,
     STATE_FIRM_UPDATE_META,
     STATE_FIRM_READ_IMG,
     STATE_FIRM_WRITE_IMG,
@@ -43,6 +44,7 @@ typedef enum
 
 - (BOOL) processDidWriteWithError:(nullable NSError*)error fromDevice:(nonnull DataExchangerDevice*)device;
 - (BOOL) processRx2Data:(nonnull NSData*)data fromDevice:(nonnull DataExchangerDevice*)device;
+- (BOOL) processTxCredit:(NSUInteger)credits fromDevice:(DataExchangerDevice*)device;
 
 + (uint16_t) crc16CalcOnData:(nonnull uint8_t*)data length:(NSUInteger)len;
 
