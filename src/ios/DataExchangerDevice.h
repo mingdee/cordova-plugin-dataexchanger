@@ -5,7 +5,7 @@
 //  Created by Ming Leung on 12-12-12.
 //  Copyright (c) 2012 GT-Tronics HK Ltd. All rights reserved.
 //
-//  $Rev: 419 $
+//  $Rev: 427 $
 //
 
 #import "BLEDevice.h"

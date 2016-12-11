@@ -46,7 +46,7 @@ static DxAppSC* gController = nil;
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         BOOL enable = [defaults boolForKey:@"enableCmdCh"];
 
-        gController = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:-127 discoveryActiveTimeout:5.0 autoConnect:YES enableCommandChannel:enable enableTransmitBackPressure:YES];
+        gController = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:-42 discoveryActiveTimeout:5.0 autoConnect:YES enableCommandChannel:enable enableTransmitBackPressure:YES];
     }
     
     return gController;
@@ -594,7 +594,7 @@ static DxAppSC* gController = nil;
 {
     NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[d.devUUID UUIDString]];
 
-    if( [firmLogSMs[devUUID] processDidWriteWithError:error fromDevice:d] )
+    if( ![firmLogSMs[devUUID] processDidWriteWithError:error fromDevice:d] )
     {
         NSDictionary* usrInfo;
         
@@ -623,29 +623,34 @@ static DxAppSC* gController = nil;
 {
     NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[d.devUUID UUIDString]];
 
-    if( [firmLogSMs[devUUID] processRx2Data:data fromDevice:d] )
+    if( ![firmLogSMs[devUUID] processRx2Data:data fromDevice:d] )
     {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
                                                             object:nil
                                                           userInfo:@{@"Command":@"RxCmd",
                                                                      @"Data":data,
-								     @"DevInfo":@{
+                                                                     @"DevInfo":@{
                                                                                      @"UUID":[d.devUUID UUIDString]
                                                                              	 }
                                                                  }];
     }
 }
 
-- (void) Device:(BLEDevice *)d TxCredit:(UInt32)credits
+- (void) Device:(DataExchangerDevice *)d TxCredit:(UInt32)credits
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
-                                                        object:nil
-                                                      userInfo:@{@"Command":@"TxCredit",
-                                                                 @"Credits":[NSNumber numberWithUnsignedInt:credits],
-                                                                 @"DevInfo":@{
-                                                                                @"UUID":[d.devUUID UUIDString]
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[d.devUUID UUIDString]];
+
+    if( ![firmLogSMs[devUUID] processTxCredit:credits fromDevice:d] )
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
+                                                            object:nil
+                                                          userInfo:@{@"Command":@"TxCredit",
+                                                                     @"Credits":[NSNumber numberWithUnsignedInt:credits],
+                                                                     @"DevInfo":@{
+                                                                             @"UUID":[d.devUUID UUIDString]
                                                                              }
-                                                                 }];
+                                                                     }];
+    }
 }
 
 - (uint16_t) crc16CalcOnData:(uint8_t *)data length:(NSUInteger)len

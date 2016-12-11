@@ -5,7 +5,7 @@
 //  Created by Ming Leung on 12-12-12.
 //  Copyright (c) 2012 GT-Tronics HK Ltd. All rights reserved.
 //
-//  $Rev: 419 $
+//  $Rev: 427 $
 //
 
 
@@ -128,7 +128,7 @@
     
     // Proximity connecting
     // - reject if enabled and is below the minimum power level
-    if( proximityConnecting && [rssi floatValue] < minPowerLevel )
+    if( proximityConnecting && ([rssi floatValue] > 0 || [rssi floatValue] < minPowerLevel) )
     {
         return -1;
     }
