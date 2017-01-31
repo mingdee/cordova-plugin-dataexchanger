@@ -25,7 +25,8 @@
 {
 }
 
-- (void) clearCallbacks;
+- (void) suspendCallbacks;
+- (void) resumeCallbacks;
 
 - (void) init:(CDVInvokedUrlCommand *)command;
 - (void)isEnabled:(CDVInvokedUrlCommand *)command;

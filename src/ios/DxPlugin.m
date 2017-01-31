@@ -27,6 +27,7 @@
 
 @property (nonatomic, strong) DxAppSC* sc;
 @property (nonatomic, strong) NSMutableDictionary* callbacks;
+@property (nonatomic, strong) NSMutableDictionary* bkupCallbacks;
 
 @end
 
@@ -34,10 +35,21 @@
 
 @synthesize sc;
 @synthesize callbacks;
+@synthesize bkupCallbacks;
 
-- (void) clearCallbacks
+- (void) suspendCallbacks
 {
+    bkupCallbacks = callbacks;
     callbacks = [@{} mutableCopy];
+}
+
+- (void) resumeCallbacks
+{
+    if( bkupCallbacks )
+    {
+        callbacks = bkupCallbacks;
+        bkupCallbacks = nil;
+    }
 }
 
 - (void)pluginInitialize {
