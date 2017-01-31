@@ -14,6 +14,7 @@
 
 static NSString* const kDevNameDX      = @"DataExchanger";
 static DxAppSC* gController = nil;
+static DxAppSC* gController2 = nil;
 
 
 @interface DxAppSC ()
@@ -38,6 +39,7 @@ static DxAppSC* gController = nil;
 @synthesize connectedDevices;
 @synthesize allDevices;
 @synthesize firmLogSMs;
+@synthesize delegate;
 
 + (DxAppSC*)controller
 {
@@ -50,6 +52,30 @@ static DxAppSC* gController = nil;
     }
     
     return gController;
+}
+
++ (DxAppSC*)controllerNoConnect
+{
+    if( gController2 == nil )
+    {
+        gController2 = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:-42 discoveryActiveTimeout:5.0 autoConnect:NO enableCommandChannel:NO enableTransmitBackPressure:NO];
+    }
+    
+    return gController2;
+}
+
++ (void) assignToController:(DxAppSC*)controller byDelegate:(id)delegate
+{
+    gController = controller;
+    if( controller )
+    {
+        controller.delegate = delegate;
+    }
+}
+
++ (void) assignToControllerNoConnect:(DxAppSC*)controller
+{
+    gController2 = controller;
 }
 
 - (id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval) timeout autoConnect:(BOOL)autoConnect enableCommandChannel:(BOOL)enableCmdCh enableTransmitBackPressure:(BOOL)enableTxCredit
@@ -170,6 +196,18 @@ static DxAppSC* gController = nil;
     }
     
     return device.state == BLE_DEVICE_CONNECTED;
+}
+
+- (BOOL) disconnect
+{
+    if( device == nil )
+    {
+        return NO;
+    }
+    
+    [device disconnect];
+    
+    return YES;
 }
 
 - (NSUInteger) connectedDeviceCount

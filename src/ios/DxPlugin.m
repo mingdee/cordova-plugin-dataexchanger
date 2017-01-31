@@ -35,6 +35,11 @@
 @synthesize sc;
 @synthesize callbacks;
 
+- (void) clearCallbacks
+{
+    callbacks = [@{} mutableCopy];
+}
+
 - (void)pluginInitialize {
 
     NSLog(@"Cordova DataExchanger Plugin");
@@ -64,6 +69,7 @@
         BOOL enableTxCredit = command.arguments.count > 5 ?[[command.arguments objectAtIndex:5] boolValue] :NO;
         
         sc = [[DxAppSC alloc] initWithDeviceCount:devCount proximityPowerLevel:pwrLevel discoveryActiveTimeout:timeout autoConnect:autoConnect enableCommandChannel:enableCmdChannel enableTransmitBackPressure:enableTxCredit];
+        [DxAppSC assignToController:sc byDelegate:self];
         
         callbacks = [@{} mutableCopy];
         

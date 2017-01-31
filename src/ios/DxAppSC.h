@@ -13,8 +13,12 @@
 @interface DxAppSC : NSObject <DataExchangerDeviceAppDelegateProtocol, DataExchangerProfileProtocol>
 
 @property (nonatomic, assign)   BOOL        enableTxCreditNoti;
+@property (nonatomic, weak)     id          delegate;
 
 + (nullable DxAppSC*)controller;
++ (nullable DxAppSC*)controllerNoConnect;
++ (void) assignToController:(nullable DxAppSC*)controller byDelegate:(nullable id)delegate;
++ (void) assignToControllerNoConnect:(nullable DxAppSC*)controller;
 
 
 - (nullable id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval) timeout autoConnect:(BOOL)autoConnect enableCommandChannel:(BOOL)enableCmdCh enableTransmitBackPressure:(BOOL)enableTxCredit;
@@ -30,7 +34,9 @@
 - (NSUInteger) connectedDeviceCount;
 - (BOOL) isDeviceConnected:(nonnull NSUUID*)uuid;
 - (BOOL) isDeviceActive:(nonnull NSUUID*)uuid;
+
 - (BOOL) isConnected; // legacy API
+- (BOOL) disconnect;  // legacy API
 
 - (BOOL) sendData:(nonnull NSData*)data;
 - (BOOL) sendData:(nonnull NSData*)data toDevice:(nonnull NSUUID*)uuid;

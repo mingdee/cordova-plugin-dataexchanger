@@ -25,6 +25,9 @@
 {
 }
 
+- (void) clearCallbacks;
+
+- (void) init:(CDVInvokedUrlCommand *)command;
 - (void)isEnabled:(CDVInvokedUrlCommand *)command;
 
 - (void)startScan:(CDVInvokedUrlCommand *)command;
