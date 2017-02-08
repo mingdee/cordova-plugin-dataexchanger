@@ -28,6 +28,8 @@
 - (void) startScan;
 - (void) stopScan;
 - (BOOL) isScanning;
+- (void) enableScanning;
+- (void) disableScanning;
 
 - (BOOL) connectDevice:(nonnull NSUUID*)uuid;
 - (BOOL) disconnectDevice:(nonnull NSUUID*)uuid;

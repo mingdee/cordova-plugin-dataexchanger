@@ -58,7 +58,7 @@ static DxAppSC* gController2 = nil;
 {
     if( gController2 == nil )
     {
-        gController2 = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:-42 discoveryActiveTimeout:5.0 autoConnect:NO enableCommandChannel:NO enableTransmitBackPressure:NO];
+        gController2 = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:0 discoveryActiveTimeout:5.0 autoConnect:NO enableCommandChannel:NO enableTransmitBackPressure:NO];
     }
     
     return gController2;
@@ -102,7 +102,7 @@ static DxAppSC* gController2 = nil;
     //
     // 1. Create BLE controller
     [BLEController enablePrivateCentralQueue];
-    bleController = [BLEController controller];
+    bleController = [[BLEController alloc] init]; // [BLEController controller];
     bleController.scanDevicePolicy = SCAN_ALLOW_DUPLICATED_KEY;
 
     for( int i=0; i < devCount; i++)
@@ -120,9 +120,9 @@ static DxAppSC* gController2 = nil;
         else
         {
             device.proximityConnecting = YES;
-            if( pwrLevel > -35 )
+            if( pwrLevel > -20 )
             {
-                pwrLevel = -35;
+                pwrLevel = -20;
             }
             device.minPowerLevel = pwrLevel;
         }
@@ -171,6 +171,16 @@ static DxAppSC* gController2 = nil;
 - (BOOL) isScanning
 {
     return [bleController isScanning];
+}
+
+- (void) enableScanning
+{
+    [bleController enableScanning];
+}
+
+- (void) disableScanning
+{
+    [bleController disableScanning];
 }
 
 - (BOOL) isDeviceActive:(NSUUID*)uuid
