@@ -18,6 +18,9 @@ static DxAppSC* gController2 = nil;
 
 
 @interface DxAppSC ()
+{
+    int _lastMinPwrLevel;
+}
 
 // BLE
 @property (nonatomic, strong)   BLEController*                  bleController;
@@ -175,12 +178,20 @@ static DxAppSC* gController2 = nil;
 
 - (void) enableScanning
 {
+    if( device && _lastMinPwrLevel != 0 )
+    {
+        device.minPowerLevel = _lastMinPwrLevel;
+    }
     [bleController enableScanning];
 }
 
 - (void) disableScanning
 {
     [bleController disableScanning];
+    if( device )
+    {
+        _lastMinPwrLevel = device.minPowerLevel;
+    }
 }
 
 - (BOOL) isDeviceActive:(NSUUID*)uuid
