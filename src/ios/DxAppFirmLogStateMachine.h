@@ -40,11 +40,13 @@ typedef enum
 
 - (BOOL) deleteFirmwareImageFromSlot:(uint8_t)slotIdx progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete: (nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler inDevice:(nonnull DataExchangerDevice*)device;
 
+- (BOOL) primeFirmwareBinary:(nonnull NSData*)firmBin name:(nullable NSString*)firmName progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(nullable void (^)(NSDictionary* _Nullable, NSError * _Nullable))completeHandler fromDevice:(nonnull DataExchangerDevice*)device;
+
 -(void) notifyDeviceOff;
 
 - (BOOL) processDidWriteWithError:(nullable NSError*)error fromDevice:(nonnull DataExchangerDevice*)device;
 - (BOOL) processRx2Data:(nonnull NSData*)data fromDevice:(nonnull DataExchangerDevice*)device;
-- (BOOL) processTxCredit:(NSUInteger)credits fromDevice:(DataExchangerDevice*)device;
+- (BOOL) processTxCredit:(NSUInteger)credits fromDevice:(nonnull DataExchangerDevice*)device;
 
 + (uint16_t) crc16CalcOnData:(nonnull uint8_t*)data length:(NSUInteger)len;
 

@@ -1,3 +1,4 @@
+cordova.define("cordova-plugin-dataexchanger.Dx", function(require, exports, module) {
 // (c) 2016 GT-tronics Canada Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -147,4 +148,20 @@ module.exports =
         cordova.exec(success, failure, 'DxPlugin', 'disableTxCreditNotification', [devUUIDStr]);
     },
 
+    retrieveFirmwareMeta: function (devUUIDStr, success, failure)
+    {
+        cordova.exec(success, failure, 'DxPlugin', 'retrieveFirmwareMeta', [devUUIDStr]);
+    },
+
+    primeFirmwareBinary: function (devUUIDStr, firmBin, firmName, success, failure)
+    {
+        cordova.exec(success, failure, 'DxPlugin', 'primeFirmwareBinary', [devUUIDStr, firmBin, firmName]);
+    },
+
+    switchFirmwareToSlot: function (devUUIDStr, slotIdx, keepConfig, success, failure)
+    {
+        cordova.exec(success, failure, 'DxPlugin', 'switchFirmwareToSlot', [devUUIDStr, slotIdx, keepConfig]);
+    },
 };
+
+});

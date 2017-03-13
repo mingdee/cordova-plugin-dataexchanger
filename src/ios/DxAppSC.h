@@ -70,8 +70,11 @@
 - (BOOL) deleteFirmwareImageFromSlot:(uint8_t)slotIdx progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete: (nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler;
 - (BOOL) deleteFirmwareImageFromSlot:(uint8_t)slotIdx progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete: (nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler inDevice:(nonnull NSUUID*)uuid;
 
-- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx;
-- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx inDevice:(nonnull NSUUID*)uuid;
+- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx keepConfig:(BOOL)bKeepConfig;
+- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx keepConfig:(BOOL)bKeepConfig inDevice:(nonnull NSUUID*)uuid;
+
+- (BOOL) primeFirmwareBinary:(nonnull NSData*)firmBin name:(nullable NSString*)firmName progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler;
+- (BOOL) primeFirmwareBinary:(nonnull NSData*)firmBin name:(nullable NSString*)firmName progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler inDevice:(nonnull NSUUID*)uuid;
 
 - (uint16_t) crc16CalcOnData:(nonnull uint8_t*)data length:(NSUInteger)len;
 

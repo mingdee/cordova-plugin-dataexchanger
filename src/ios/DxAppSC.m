@@ -51,7 +51,7 @@ static DxAppSC* gController2 = nil;
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         BOOL enable = [defaults boolForKey:@"enableCmdCh"];
 
-        gController = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:-42 discoveryActiveTimeout:5.0 autoConnect:YES enableCommandChannel:enable enableTransmitBackPressure:YES];
+        gController = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:-50 discoveryActiveTimeout:5.0 autoConnect:YES enableCommandChannel:enable enableTransmitBackPressure:YES];
     }
     
     return gController;
@@ -463,17 +463,17 @@ static DxAppSC* gController2 = nil;
     return [firmLogSMs[uuid] deleteFirmwareImageFromSlot:slotIdx progress:progressHandler complete:completeHandler inDevice:d];
 }
 
-- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx
+- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx keepConfig:(BOOL)bKeepConfig
 {
     if( device == nil )
     {
         return NO;
     }
     
-    return [self _switchFirmwareImageToSlot:slotIdx inDevice:device];
+    return [self _switchFirmwareImageToSlot:slotIdx keepConfig:bKeepConfig inDevice:device];
 }
 
-- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx inDevice:(NSUUID*)uuid
+- (BOOL) switchFirmwareImageToSlot:(uint8_t)slotIdx keepConfig:(BOOL)bKeepConfig inDevice:(NSUUID*)uuid
 {
     DataExchangerDevice* d = connectedDevices[uuid];
     if( !d )
@@ -481,16 +481,34 @@ static DxAppSC* gController2 = nil;
         return NO;
     }
     
-    return [self _switchFirmwareImageToSlot:slotIdx inDevice:d];
+    return [self _switchFirmwareImageToSlot:slotIdx keepConfig:bKeepConfig inDevice:d];
 }
 
-- (BOOL) _switchFirmwareImageToSlot:(uint8_t)slotIdx inDevice:(DataExchangerDevice*)d
+- (BOOL) _switchFirmwareImageToSlot:(uint8_t)slotIdx keepConfig:(BOOL)bKeepConfig inDevice:(DataExchangerDevice*)d
 {
-    NSString* cmdStr = [NSString stringWithFormat:@"AT+IMG=%u\r\n", slotIdx];
+    NSString* cmdStr = [NSString stringWithFormat:@"AT+IMG=%u\r\n", bKeepConfig ?slotIdx :slotIdx+128];
     BOOL success = [d sendCmd:[cmdStr dataUsingEncoding:NSUTF8StringEncoding] withResponse:YES];
     NSLog(@"[INFO] Firmware: %@", cmdStr);
     
     return success;
+}
+
+- (BOOL) primeFirmwareBinary:(nonnull NSData*)firmBin name:(nullable NSString*)firmName progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(void (^)(NSDictionary*, NSError *))completeHandler
+{
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[device.devUUID UUIDString]];
+    DxAppFirmLogStateMachine* sm = firmLogSMs[devUUID];
+    
+    return [sm primeFirmwareBinary:firmBin name:firmName progress:progressHandler complete:completeHandler fromDevice:device];
+}
+
+- (BOOL) primeFirmwareBinary:(nonnull NSData*)firmBin name:(nullable NSString*)firmName progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(void (^)(NSDictionary*, NSError *))completeHandler inDevice:(NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [firmLogSMs[uuid] primeFirmwareBinary:firmBin name:firmName progress:progressHandler complete:completeHandler fromDevice:d];
 }
 
 

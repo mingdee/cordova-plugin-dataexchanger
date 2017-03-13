@@ -54,6 +54,10 @@
 - (void)enableTxCreditNotification:(CDVInvokedUrlCommand *)command;
 - (void)disableTxCreditNotification:(CDVInvokedUrlCommand *)command;
 
+- (void) retrieveFirmwareMeta:(CDVInvokedUrlCommand *)command;
+- (void) primeFirmwareBinary:(CDVInvokedUrlCommand *)command;
+- (void) switchFirmwareToSlot:(CDVInvokedUrlCommand*)command;
+
 @end
 
 #endif

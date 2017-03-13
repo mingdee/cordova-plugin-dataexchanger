@@ -73,7 +73,7 @@
     }
     else
     {
-        NSUInteger devCount = command.arguments.count > 0 ?[[command.arguments objectAtIndex:0] integerValue] :1;
+        NSUInteger devCount = command.arguments.count > 0 ?[command.arguments[0] integerValue] :1;
         float pwrLevel = command.arguments.count > 1 ?[[command.arguments objectAtIndex:1] floatValue] :-127.0;
         NSTimeInterval timeout = command.arguments.count > 2 ?[[command.arguments objectAtIndex:2] doubleValue] :5.0;
         BOOL autoConnect = command.arguments.count > 3 ?[[command.arguments objectAtIndex:3] boolValue] :NO;
@@ -97,7 +97,7 @@
 
 - (void) connect:(CDVInvokedUrlCommand *)command
 {
-    NSString* uuid = [command.arguments objectAtIndex:0];
+    NSString* uuid = command.arguments[0];
     NSString* cbLabel = [NSString stringWithFormat:@"Connect_%@", uuid];
     BOOL success = [sc connectDevice:[[NSUUID alloc] initWithUUIDString:uuid]];
     
@@ -114,7 +114,7 @@
 // disconnect: function (device_id, success, failure) {
 - (void) disconnect:(CDVInvokedUrlCommand*)command
 {
-    NSString *uuid = [command.arguments objectAtIndex:0];
+    NSString *uuid = command.arguments[0];
     BOOL success = [sc disconnectDevice:[[NSUUID alloc] initWithUUIDString:uuid]];
 
     if( !success )
@@ -154,7 +154,7 @@
 
 - (void) isConnected:(CDVInvokedUrlCommand*)command
 {
-    NSString *uuid = [command.arguments objectAtIndex:0];
+    NSString *uuid = command.arguments[0];
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[sc isDeviceConnected:[[NSUUID alloc] initWithUUIDString:uuid]]];
     
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -163,9 +163,10 @@
 - (void) sendData:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult *pluginResult = nil;
+    NSString *uuid = command.arguments[0];
     NSData* data = command.arguments[1];
     
-    BOOL success = [sc sendData:data];
+    BOOL success = [sc sendData:data toDevice:[[NSUUID alloc] initWithUUIDString:uuid]];
     
     if( success )
     {
@@ -182,9 +183,10 @@
 - (void) sendCmd:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult *pluginResult = nil;
+    NSString *uuid = command.arguments[0];
     NSData* data = command.arguments[1];
     
-    BOOL success = [sc sendCmd:data];
+    BOOL success = [sc sendCmd:data toDevice:[[NSUUID alloc] initWithUUIDString:uuid]];
     
     if( success )
     {
@@ -201,8 +203,9 @@
 - (void) readTxCredit:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult *pluginResult = nil;
+    NSString *uuid = command.arguments[0];
     
-    BOOL success = [sc readTxCredit];
+    BOOL success = [sc readTxCreditFromDevice:[[NSUUID alloc] initWithUUIDString:uuid]];
     
     if( success )
     {
@@ -219,9 +222,10 @@
 - (void) writeTxCreditReportLoopCount:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult *pluginResult = nil;
+    NSString *uuid = command.arguments[0];
     uint32_t cnt = [command.arguments[1] unsignedIntValue];
     
-    BOOL success = [sc writeTxCreditReportLoopCount:cnt];
+    BOOL success = [sc writeTxCreditReportLoopCount:cnt inDevice:[[NSUUID alloc] initWithUUIDString:uuid]];
     
     if( success )
     {
@@ -238,7 +242,7 @@
 
 - (void) enableRxDataNotification:(CDVInvokedUrlCommand *)command
 {
-    NSString* uuid = [command.arguments objectAtIndex:0];
+    NSString* uuid = command.arguments[0];
     NSString* key = [NSString stringWithFormat:@"RxData_%@", uuid];
 
     callbacks[key] = command.callbackId;
@@ -246,7 +250,7 @@
 
 - (void) disableRxDataNotification:(CDVInvokedUrlCommand *)command
 {
-    NSString* uuid = [command.arguments objectAtIndex:0];
+    NSString* uuid = command.arguments[0];
     NSString* key = [NSString stringWithFormat:@"RxData_%@", uuid];
     
     [callbacks removeObjectForKey:key];
@@ -254,7 +258,7 @@
 
 - (void) enableRxCmdNotification:(CDVInvokedUrlCommand *)command
 {
-    NSString* uuid = [command.arguments objectAtIndex:0];
+    NSString* uuid = command.arguments[0];
     NSString* key = [NSString stringWithFormat:@"RxCmd_%@", uuid];
     
     callbacks[key] = command.callbackId;
@@ -262,7 +266,7 @@
 
 - (void) disableRxCmdNotification:(CDVInvokedUrlCommand *)command
 {
-    NSString* uuid = [command.arguments objectAtIndex:0];
+    NSString* uuid = command.arguments[0];
     NSString* key = [NSString stringWithFormat:@"RxCmd_%@", uuid];
     
     [callbacks removeObjectForKey:key];
@@ -270,7 +274,7 @@
 
 - (void) enableTxCreditNotification:(CDVInvokedUrlCommand *)command
 {
-    NSString* uuid = [command.arguments objectAtIndex:0];
+    NSString* uuid = command.arguments[0];
     NSString* key = [NSString stringWithFormat:@"TxCredit_%@", uuid];
     
     callbacks[key] = command.callbackId;
@@ -278,10 +282,108 @@
 
 - (void) disableTxCreditNotification:(CDVInvokedUrlCommand *)command
 {
-    NSString* uuid = [command.arguments objectAtIndex:0];
+    NSString* uuid = command.arguments[0];
     NSString* key = [NSString stringWithFormat:@"TxCredit_%@", uuid];
     
     [callbacks removeObjectForKey:key];
+}
+
+- (void) retrieveFirmwareMeta:(CDVInvokedUrlCommand*)command
+{
+    CDVPluginResult *pluginResult = nil;
+    NSString* uuid = command.arguments[0];
+    NSString* key = [NSString stringWithFormat:@"RetrievFirmMeta_%@", uuid];
+    
+    BOOL success = [sc retrieveFirmwareMetaWithProgress:^(NSUInteger stage, double progress) {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"stage":[NSNumber numberWithUnsignedInteger:stage],
+                                                                            @"progress":[NSNumber numberWithDouble:progress],
+                                                                            @"isdone":@NO}];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[key]];
+    } complete:^(NSDictionary * _Nullable metas, NSError * _Nullable err) {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"metas":metas ?metas :@{},
+                                                                            @"status":err ?@"FAILED" :@"OK",
+                                                                            @"reason":err ?err.userInfo[@"Error"] :@"",
+                                                                            @"isdone":@YES}];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[key]];
+        [callbacks removeObjectForKey:key];
+    } fromDevice:[[NSUUID alloc] initWithUUIDString:uuid]];
+    
+    if( success )
+    {
+        callbacks[key] = command.callbackId;
+    }
+    else
+    {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                     messageAsDictionary:@{@"ErrMsg":@"retrieve firmware meta failed"}];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
+}
+
+- (void) primeFirmwareBinary:(CDVInvokedUrlCommand*)command
+{
+    CDVPluginResult *pluginResult = nil;
+    NSString* uuid = command.arguments[0];
+    NSData* firmBin = command.arguments[1];
+    NSString* firmName = command.arguments[2];
+    NSString* key = [NSString stringWithFormat:@"PrimeFirmBin_%@", uuid];
+    
+    BOOL success = [sc primeFirmwareBinary:firmBin name:firmName progress:^(NSUInteger stage, double progress) {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"stage":[NSNumber numberWithUnsignedInteger:stage],
+                                                                            @"progress":[NSNumber numberWithDouble:progress],
+                                                                            @"isdone":@NO}];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[key]];
+    } complete:^(NSDictionary * _Nullable metas, NSError * _Nullable err) {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"metas":metas ?metas :@{},
+                                                                            @"status":err ?@"FAILED" :@"OK",
+                                                                            @"reason":err ?err.userInfo[@"Error"] :@"",
+                                                                            @"isdone":@YES}];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[key]];
+        [callbacks removeObjectForKey:key];
+    } inDevice:[[NSUUID alloc] initWithUUIDString:uuid]];
+    
+    if( success )
+    {
+        callbacks[key] = command.callbackId;
+    }
+    else
+    {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                     messageAsDictionary:@{@"ErrMsg":@"retrieve firmware meta failed"}];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
+}
+
+- (void) switchFirmwareToSlot:(CDVInvokedUrlCommand*)command
+{
+    CDVPluginResult *pluginResult = nil;
+    NSString* uuid = command.arguments[0];
+    NSUInteger slotIdx = [command.arguments[1] unsignedIntegerValue];
+    BOOL keepConfig = [command.arguments[2] boolValue];
+    
+    BOOL success = [sc switchFirmwareImageToSlot:slotIdx
+                                      keepConfig:keepConfig
+                                        inDevice:[[NSUUID alloc] initWithUUIDString:uuid]];
+    if( success )
+    {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    }
+    else
+    {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                     messageAsDictionary:@{@"ErrMsg":@"switchFirmwareImageToSlot failed"}];
+        
+    }
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+
 }
 
 - (void) bleNotify:(NSNotification*)noti
