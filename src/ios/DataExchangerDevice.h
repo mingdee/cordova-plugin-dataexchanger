@@ -37,6 +37,7 @@
 - (BOOL) sendData:(NSData*)data;
 - (BOOL) sendCmd:(NSData*)data withResponse:(BOOL)response;
 - (BOOL) enableCmd:(BOOL)enabled;
+- (BOOL) enableChannelScrambler:(BOOL)enabled;
 - (BOOL) enableTxCreditNotification:(BOOL)enabled;
 - (BOOL) readTxCredit;
 - (BOOL) writeTxCreditReportLoopCount:(uint32_t)count;

@@ -20,6 +20,7 @@ extern NSString* const kDXI2cSetupUUID;
 @property (nonatomic, weak)   id<DataExchangerProfileProtocol>      appDelegate;
 @property (nonatomic, assign) BOOL                                  enableRx2Noti;
 @property (nonatomic, assign) BOOL                                  enableTxCreditNoti;
+@property (nonatomic, assign) BOOL                                  enableChScrmb;
 
 //
 //Init
@@ -60,6 +61,11 @@ extern NSString* const kDXI2cSetupUUID;
 // This method will enable/disable Tx port credit notification of the connected BLE device
 //
 - (BOOL) enableTxCreditNotification:(BOOL)enabled;
+
+//
+// This methd will enabl/disable channel scrambling
+//
+- (BOOL) enableChannelScrambler:(BOOL)enabled;
 
 //
 // This method will read the TX Credit count

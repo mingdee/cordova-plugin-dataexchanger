@@ -49,9 +49,10 @@ static DxAppSC* gController2 = nil;
     if( gController == nil )
     {
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        BOOL enable = [defaults boolForKey:@"enableCmdCh"];
+        BOOL enableCmdCh = [defaults boolForKey:@"enableCmdCh"];
+        BOOL enableChScrm = [defaults boolForKey:@"enableChScrm"];
 
-        gController = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:-50 discoveryActiveTimeout:5.0 autoConnect:YES enableCommandChannel:enable enableTransmitBackPressure:YES];
+        gController = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:-50 discoveryActiveTimeout:5.0 autoConnect:YES enableCommandChannel:enableCmdCh enableChannelScrambler:enableChScrm enableTransmitBackPressure:YES];
     }
     
     return gController;
@@ -61,7 +62,7 @@ static DxAppSC* gController2 = nil;
 {
     if( gController2 == nil )
     {
-        gController2 = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:0 discoveryActiveTimeout:5.0 autoConnect:NO enableCommandChannel:NO enableTransmitBackPressure:NO];
+        gController2 = [[DxAppSC alloc] initWithDeviceCount:1 proximityPowerLevel:0 discoveryActiveTimeout:5.0 autoConnect:NO enableCommandChannel:NO enableChannelScrambler:NO enableTransmitBackPressure:NO];
     }
     
     return gController2;
@@ -81,7 +82,7 @@ static DxAppSC* gController2 = nil;
     gController2 = controller;
 }
 
-- (id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval) timeout autoConnect:(BOOL)autoConnect enableCommandChannel:(BOOL)enableCmdCh enableTransmitBackPressure:(BOOL)enableTxCredit
+- (id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval) timeout autoConnect:(BOOL)autoConnect enableCommandChannel:(BOOL)enableCmdCh enableChannelScrambler:(BOOL)enableChScrm enableTransmitBackPressure:(BOOL)enableTxCredit
 {
     self = [super init];
     if( self == nil )
@@ -134,6 +135,7 @@ static DxAppSC* gController2 = nil;
         DataExchangerProfile* dxp = (DataExchangerProfile*)[DataExchangerProfile profileWithDevice:device andAppDelegate:self];
         
         dxp.enableRx2Noti = enableCmdCh;
+        dxp.enableChScrmb = enableChScrm;
         dxp.enableTxCreditNoti = enableTxCredit;
         
         // 4. Add DataExchanger profile in DataExchanger device
@@ -319,6 +321,27 @@ static DxAppSC* gController2 = nil;
     }
     return [d enableCmd:enabled];
 }
+
+- (BOOL) enableChannelScrambler:(BOOL)enabled
+{
+    if( device == nil )
+    {
+        return NO;
+    }
+    
+    return [device enableChannelScrambler:enabled];
+}
+
+- (BOOL) enableChannelScrambler:(BOOL)enabled onDevice:(nonnull NSUUID*)uuid
+{
+    DataExchangerDevice* d = connectedDevices[uuid];
+    if( !d )
+    {
+        return NO;
+    }
+    return [d enableChannelScrambler:enabled];
+}
+
 
 - (BOOL) readTxCredit
 {

@@ -219,6 +219,25 @@
     return NO;
 }
 
+- (BOOL) enableChannelScrambler:(BOOL)enabled
+{
+    if( self.state != BLE_DEVICE_CONNECTED )
+    {
+        return NO;
+    }
+    
+    NSSet* profiles = [self listRegisteredProfile];
+    
+    for( BLEProfile* profile in profiles )
+    {
+        if( [profile isMemberOfClass:[DataExchangerProfile class]] )
+        {
+            return [(DataExchangerProfile*)profile enableChannelScrambler:enabled];
+        }
+    }
+    return NO;
+}
+
 - (BOOL) readTxCredit
 {
     if( self.state != BLE_DEVICE_CONNECTED )

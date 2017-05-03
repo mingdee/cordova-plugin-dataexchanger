@@ -21,7 +21,7 @@
 + (void) assignToControllerNoConnect:(nullable DxAppSC*)controller;
 
 
-- (nullable id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval) timeout autoConnect:(BOOL)autoConnect enableCommandChannel:(BOOL)enableCmdCh enableTransmitBackPressure:(BOOL)enableTxCredit;
+- (nullable id) initWithDeviceCount:(NSUInteger)devCount proximityPowerLevel:(float)pwrLevel discoveryActiveTimeout:(NSTimeInterval) timeout autoConnect:(BOOL)autoConnect enableCommandChannel:(BOOL)enableCmdCh enableChannelScrambler:(BOOL)enableChScrm enableTransmitBackPressure:(BOOL)enableTxCredit;
 
 - (BOOL) isEnabled;
 
@@ -48,6 +48,9 @@
 
 - (BOOL) enableCmd:(BOOL)enabled;
 - (BOOL) enableCmd:(BOOL)enabled onDevice:(nonnull NSUUID*)uuid;
+
+- (BOOL) enableChannelScrambler:(BOOL)enabled;
+- (BOOL) enableChannelScrambler:(BOOL)enabled onDevice:(nonnull NSUUID*)uuid;
 
 - (BOOL) readTxCredit;
 - (BOOL) readTxCreditFromDevice:(nonnull NSUUID*)uuid;

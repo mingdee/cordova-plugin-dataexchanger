@@ -18,6 +18,7 @@ angular.module('ngCordovaDataExchanger', []).factory('$cordovaDataExchanger', ['
 		params.discoveryActiveTimeout,
 		params.autoConnect,
 		params.enableCommandChannel,
+		params.enableChannelScrambler,
 		params.enableTransmitBackpressure,
         function(obj) {
           q.notify(obj);
