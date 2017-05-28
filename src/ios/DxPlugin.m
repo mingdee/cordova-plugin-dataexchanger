@@ -78,9 +78,10 @@
         NSTimeInterval timeout = command.arguments.count > 2 ?[[command.arguments objectAtIndex:2] doubleValue] :5.0;
         BOOL autoConnect = command.arguments.count > 3 ?[[command.arguments objectAtIndex:3] boolValue] :NO;
         BOOL enableCmdChannel = command.arguments.count > 4 ?[[command.arguments objectAtIndex:4] boolValue] :NO;
-        BOOL enableTxCredit = command.arguments.count > 5 ?[[command.arguments objectAtIndex:5] boolValue] :NO;
+        BOOL enableChannelScram = command.arguments.count > 5 ?[[command.arguments objectAtIndex:5] boolValue] :NO;
+        BOOL enableTxCredit = command.arguments.count > 6 ?[[command.arguments objectAtIndex:6] boolValue] :NO;
         
-        sc = [[DxAppSC alloc] initWithDeviceCount:devCount proximityPowerLevel:pwrLevel discoveryActiveTimeout:timeout autoConnect:autoConnect enableCommandChannel:enableCmdChannel enableTransmitBackPressure:enableTxCredit];
+        sc = [[DxAppSC alloc] initWithDeviceCount:devCount proximityPowerLevel:pwrLevel discoveryActiveTimeout:timeout autoConnect:autoConnect enableCommandChannel:enableCmdChannel enableChannelScrambler:enableChannelScram enableTransmitBackPressure:enableTxCredit];
         [DxAppSC assignToController:sc byDelegate:self];
         
         callbacks = [@{} mutableCopy];
