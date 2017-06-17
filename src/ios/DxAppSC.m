@@ -90,6 +90,16 @@ static DxAppSC* gController2 = nil;
         return nil;
     }
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(bleControllerOn)
+                                                 name:@"BleControllerOn"
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(bleControllerOff)
+                                                 name:@"BleControllerOff"
+                                               object:nil];
+    
     activeDevices = [@{} mutableCopy];
     connectedDevices = [@{} mutableCopy];
     allDevices = [NSMutableSet set];
@@ -756,6 +766,26 @@ static DxAppSC* gController2 = nil;
 - (uint16_t) crc16CalcOnData:(uint8_t *)data length:(NSUInteger)len
 {
     return [DxAppFirmLogStateMachine crc16CalcOnData:data length:len];
+}
+
+- (void) bleControllerOn
+{
+    dispatch_async(dispatch_get_main_queue(), ^(){
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
+                                                            object:nil
+                                                          userInfo:@{@"Command":@"BleOn"}
+         ];
+    });
+}
+
+- (void) bleControllerOff
+{
+    dispatch_async(dispatch_get_main_queue(), ^(){
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
+                                                            object:nil
+                                                          userInfo:@{@"Command":@"BleOff"}
+         ];
+    });
 }
 
 @end

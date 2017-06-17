@@ -55,7 +55,7 @@
 - (void)pluginInitialize {
 
     NSLog(@"Cordova DataExchanger Plugin");
-    NSLog(@"(c)2016 GT-tronics Canada Ltd");
+    NSLog(@"(c)2016-2017 GT-tronics Canada Ltd");
 
     [super pluginInitialize];
 
@@ -91,9 +91,12 @@
                                                      name:@"BleNotify"
                                                    object:nil];
 
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+            messageAsDictionary:@{@"state":@"init"}];
+            
     }
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    callbacks[@"Init"] = command.callbackId;
 }
 
 - (void) connect:(CDVInvokedUrlCommand *)command
@@ -398,7 +401,21 @@
     NSString* txCreditLabel = [NSString stringWithFormat:@"TxCredit_%@", uuid];
     
 
-    if( [cmd isEqualToString:@"Start"] )
+    if( [cmd isEqualToString:@"BleOn"] && callbacks[@"Init"] )
+    {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"state":@"syson"}];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[@"Init"]];
+    }
+    else if( [cmd isEqualToString:@"BleOff"] && callbacks[@"Init"] )
+    {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"state":@"sysoff"}];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[@"Init"]];
+    }
+    else if( [cmd isEqualToString:@"Start"] )
     {
         
     }
