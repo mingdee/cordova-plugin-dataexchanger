@@ -95,6 +95,7 @@
             messageAsDictionary:@{@"state":@"init"}];
             
     }
+    [pluginResult setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     callbacks[@"Init"] = command.callbackId;
 }
