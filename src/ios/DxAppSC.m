@@ -100,6 +100,10 @@ static DxAppSC* gController2 = nil;
                                                  name:@"BleControllerOff"
                                                object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(bleControllerReset)
+                                                 name:@"BleControllerReset"
+                                               object:nil];
     activeDevices = [@{} mutableCopy];
     connectedDevices = [@{} mutableCopy];
     allDevices = [NSMutableSet set];
@@ -784,6 +788,16 @@ static DxAppSC* gController2 = nil;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
                                                             object:nil
                                                           userInfo:@{@"Command":@"BleOff"}
+         ];
+    });
+}
+
+- (void) bleControllerReset
+{
+    dispatch_async(dispatch_get_main_queue(), ^(){
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"BleNotify"
+                                                            object:nil
+                                                          userInfo:@{@"Command":@"BleReset"}
          ];
     });
 }

@@ -416,6 +416,13 @@
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[@"Init"]];
     }
+    else if( [cmd isEqualToString:@"BleReset"] && callbacks[@"Init"] )
+    {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"state":@"sysreset"}];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[@"Init"]];
+    }
     else if( [cmd isEqualToString:@"Start"] )
     {
         
