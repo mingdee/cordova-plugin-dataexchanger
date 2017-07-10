@@ -345,8 +345,17 @@
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbacks[key]];
     } complete:^(NSDictionary * _Nullable metas, NSError * _Nullable err) {
+        NSMutableDictionary* filteredMetas = nil;
+        if( metas )
+        {
+            filteredMetas = [metas mutableCopy];
+            [filteredMetas removeObjectForKey:@"SlotScratchPads"];
+            [filteredMetas removeObjectForKey:@"SlotValidMask"];
+            CBUUID* cbUUID = filteredMetas[@"DevUUID"];
+            filteredMetas[@"DevUUID"] = [cbUUID UUIDString];
+        }
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"metas":metas ?metas :@{},
+                                                      messageAsDictionary:@{@"metas":filteredMetas ?filteredMetas :@{},
                                                                             @"status":err ?@"FAILED" :@"OK",
                                                                             @"reason":err ?err.userInfo[@"Error"] :@"",
                                                                             @"isdone":@YES}];
