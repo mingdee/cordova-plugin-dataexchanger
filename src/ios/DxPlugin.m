@@ -335,7 +335,12 @@
     NSString* uuid = command.arguments[0];
     NSData* firmBin = command.arguments[1];
     NSString* firmName = command.arguments[2];
+    NSString* ilCmd = command.arguments[3];
+    NSUInteger ilCnt = [command.arguments[4] unsignedIntegerValue];
     NSString* key = [NSString stringWithFormat:@"PrimeFirmBin_%@", uuid];
+    
+    // Set interleave command and count
+    [sc setInterleaveCommand:ilCmd interleaveCount:ilCnt];
     
     BOOL success = [sc primeFirmwareBinary:firmBin name:firmName progress:^(NSUInteger stage, double progress) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK

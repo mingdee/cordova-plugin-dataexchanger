@@ -81,4 +81,7 @@
 
 - (uint16_t) crc16CalcOnData:(nonnull uint8_t*)data length:(NSUInteger)len;
 
+- (void) setInterleavingCommand:(nullable NSString*)cmd interleavingCount:(NSUInteger)count;
+- (void) setInterleavingCommand:(nullable NSString*)cmd interleavingCount:(NSUInteger)count inDevice:(nonnull NSUUID*)uuid;
+
 @end

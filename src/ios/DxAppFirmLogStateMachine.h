@@ -18,6 +18,7 @@ typedef enum
     STATE_FIRM_UPDATE_META,
     STATE_FIRM_READ_IMG,
     STATE_FIRM_WRITE_IMG,
+    STATE_FIRM_WRITE_IMG_INTER_CMD,
     STATE_FIRM_WHICH_SLOT,
     STATE_FIRM_CRC_CHECK,
     
@@ -28,7 +29,9 @@ typedef enum
 
 @interface DxAppFirmLogStateMachine : NSObject
 
-@property (nonatomic, readwrite) FirmLogStateTyp    state;
+@property (nonatomic, readwrite) FirmLogStateTyp        state;
+@property (nonatomic, strong)    NSString* _Nullable    interleaveCommand;
+@property (nonatomic, assign)    NSUInteger             interleaveCount;
 
 - (BOOL) retrieveDataLoggerMetaWithCompletion:(nullable void (^) (NSDictionary* _Nullable metas, NSError* _Nullable err))completeHandler fromDevice:(nonnull DataExchangerDevice*)device;
 

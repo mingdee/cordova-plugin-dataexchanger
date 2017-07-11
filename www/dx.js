@@ -153,9 +153,9 @@ module.exports =
         cordova.exec(success, failure, 'DxPlugin', 'retrieveFirmwareMeta', [devUUIDStr]);
     },
 
-    primeFirmwareBinary: function (devUUIDStr, firmBin, firmName, success, failure)
+    primeFirmwareBinary: function (devUUIDStr, firmBin, firmName, interleaveCommand, interleaveCount, success, failure)
     {
-        cordova.exec(success, failure, 'DxPlugin', 'primeFirmwareBinary', [devUUIDStr, firmBin, firmName]);
+        cordova.exec(success, failure, 'DxPlugin', 'primeFirmwareBinary', [devUUIDStr, firmBin, firmName, interleaveCommand, interleaveCount]);
     },
 
     switchFirmwareToSlot: function (devUUIDStr, slotIdx, keepConfig, success, failure)

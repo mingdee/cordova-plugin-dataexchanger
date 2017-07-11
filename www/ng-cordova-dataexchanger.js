@@ -329,6 +329,8 @@ angular.module('ngCordovaDataExchanger', []).factory('$cordovaDataExchanger', ['
         params.uuid,
         params.firmBin,
         params.firmName,
+        params.interleaveCommand,
+        params.interleaveCount,
         function(obj) {
           q.notify(obj);
         },

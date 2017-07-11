@@ -530,7 +530,7 @@ static DxAppSC* gController2 = nil;
     return success;
 }
 
-- (BOOL) primeFirmwareBinary:(nonnull NSData*)firmBin name:(nullable NSString*)firmName progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(void (^)(NSDictionary*, NSError *))completeHandler
+- (BOOL) primeFirmwareBinary:(nonnull NSData*)firmBin name:(nullable NSString*)firmName progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(nullable void (^)(NSDictionary*, NSError *))completeHandler
 {
     NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[device.devUUID UUIDString]];
     DxAppFirmLogStateMachine* sm = firmLogSMs[devUUID];
@@ -538,7 +538,7 @@ static DxAppSC* gController2 = nil;
     return [sm primeFirmwareBinary:firmBin name:firmName progress:progressHandler complete:completeHandler fromDevice:device];
 }
 
-- (BOOL) primeFirmwareBinary:(nonnull NSData*)firmBin name:(nullable NSString*)firmName progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(void (^)(NSDictionary*, NSError *))completeHandler inDevice:(NSUUID*)uuid
+- (BOOL) primeFirmwareBinary:(nonnull NSData*)firmBin name:(nullable NSString*)firmName progress:(nullable void (^) (NSUInteger stage, double progress))progressHandler complete:(nullable void (^)(NSDictionary*, NSError *))completeHandler inDevice:(nonnull NSUUID*)uuid
 {
     DataExchangerDevice* d = connectedDevices[uuid];
     if( !d )
@@ -548,6 +548,21 @@ static DxAppSC* gController2 = nil;
     return [firmLogSMs[uuid] primeFirmwareBinary:firmBin name:firmName progress:progressHandler complete:completeHandler fromDevice:d];
 }
 
+- (void) setInterleavingCommand:(nullable NSString*)cmd interleavingCount:(NSUInteger)count
+{
+    NSUUID* devUUID = [[NSUUID alloc] initWithUUIDString:[device.devUUID UUIDString]];
+    DxAppFirmLogStateMachine* sm = firmLogSMs[devUUID];
+    sm.interleaveCommand = cmd;
+    sm.interleaveCount = count;
+}
+
+- (void) setInterleavingCommand:(nullable NSString*)cmd interleavingCount:(NSUInteger)count inDevice:(nonnull NSUUID*)uuid
+{
+    
+    DxAppFirmLogStateMachine* sm = firmLogSMs[uuid];
+    sm.interleaveCommand = cmd;
+    sm.interleaveCount = count;
+}
 
 #pragma mark -
 #pragma mark - DataExchangerDeviceAppDelegateProtocol methods
