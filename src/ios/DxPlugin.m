@@ -340,7 +340,7 @@
     NSString* key = [NSString stringWithFormat:@"PrimeFirmBin_%@", uuid];
     
     // Set interleave command and count
-    [sc setInterleaveCommand:ilCmd interleaveCount:ilCnt];
+    [sc setInterleavingCommand:ilCmd interleavingCount:ilCnt];
     
     BOOL success = [sc primeFirmwareBinary:firmBin name:firmName progress:^(NSUInteger stage, double progress) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
