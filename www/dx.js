@@ -59,9 +59,9 @@ function convertToNativeJS(object)
 
 module.exports =
 {
-    init: function(devCount, proximityPowerLevel, discoveryActiveTimeout, autoConnect, enableCommandChannel, enableChannelScrambler, enableTransmitBackpressure, success, failure)
+    init: function(devCount, proximityPowerLevel, discoveryActiveTimeout, autoConnect, enableCommandChannel, enableChannelScrambler, enableTransmitBackpressure, serviceUUIDStrings, success, failure)
     {
-        cordova.exec(success, failure, 'DxPlugin', 'init', [devCount, proximityPowerLevel, discoveryActiveTimeout, autoConnect, enableCommandChannel, enableChannelScrambler, enableTransmitBackpressure]);
+        cordova.exec(success, failure, 'DxPlugin', 'init', [devCount, proximityPowerLevel, discoveryActiveTimeout, autoConnect, enableCommandChannel, enableChannelScrambler, enableTransmitBackpressure, serviceUUIDStrings]);
     },
                
     startScan: function (success, failure)

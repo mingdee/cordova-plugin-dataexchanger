@@ -20,6 +20,7 @@ angular.module('ngCordovaDataExchanger', []).factory('$cordovaDataExchanger', ['
 		params.enableCommandChannel,
 		params.enableChannelScrambler,
 		params.enableTransmitBackpressure,
+        params.serviceUUIDStrings,
         function(obj) {
           q.notify(obj);
         },

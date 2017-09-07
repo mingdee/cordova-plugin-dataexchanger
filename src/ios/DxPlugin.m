@@ -80,8 +80,30 @@
         BOOL enableCmdChannel = command.arguments.count > 4 ?[[command.arguments objectAtIndex:4] boolValue] :NO;
         BOOL enableChannelScram = command.arguments.count > 5 ?[[command.arguments objectAtIndex:5] boolValue] :NO;
         BOOL enableTxCredit = command.arguments.count > 6 ?[[command.arguments objectAtIndex:6] boolValue] :NO;
+        NSArray* suuidStrs = command.arguments.count > 7 ?[command.arguments objectAtIndex:7] :nil;
         
-        sc = [[DxAppSC alloc] initWithDeviceCount:devCount proximityPowerLevel:pwrLevel discoveryActiveTimeout:timeout autoConnect:autoConnect enableCommandChannel:enableCmdChannel enableChannelScrambler:enableChannelScram enableTransmitBackPressure:enableTxCredit];
+        if( ![[suuidStrs class] isSubclassOfClass:[NSArray class]] || suuidStrs.count == 0 )
+        {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"missing service UUID strings"];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            return;
+        }
+        else
+        {
+            // Verify the UUID string is valid
+            for( NSString* suuidStr in suuidStrs )
+            {
+                if( [[NSUUID alloc] initWithUUIDString:[suuidStr capitalizedString]] == nil )
+                {
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"invalid service UUID strings"];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    return;
+                }
+            }
+        
+        }
+        
+        sc = [[DxAppSC alloc] initWithDeviceCount:devCount proximityPowerLevel:pwrLevel discoveryActiveTimeout:timeout autoConnect:autoConnect enableCommandChannel:enableCmdChannel enableChannelScrambler:enableChannelScram enableTransmitBackPressure:enableTxCredit serviceUUIDStrings:suuidStrs];
         [DxAppSC assignToController:sc byDelegate:self];
         
         callbacks = [@{} mutableCopy];

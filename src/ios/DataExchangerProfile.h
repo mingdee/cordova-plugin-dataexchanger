@@ -5,7 +5,7 @@
 //  Created by Ming Leung on 12-12-12.
 //  Copyright (c) 2012 GT-Tronics HK Ltd. All rights reserved.
 //
-//  $Rev: 51 $
+//  $Rev: 53 $
 //
 
 
@@ -26,7 +26,9 @@ extern NSString* const kDXI2cSetupUUID;
 //Init
 //
 - (BLEProfile*) initWithDevice:(BLEDevice*)device andAppDelegate:(id<DataExchangerProfileProtocol>)appDelegate;
+- (BLEProfile*) initWithDevice:(BLEDevice*)device andAppDelegate:(id<DataExchangerProfileProtocol>)delegate andServiceUUIDStrings:(NSArray*)suuidStrs;
 + (BLEProfile*) profileWithDevice:(BLEDevice*)device andAppDelegate:(id<DataExchangerProfileProtocol>)appDelegate;
++ (BLEProfile*) profileWithDevice:(BLEDevice*)device andAppDelegate:(id<DataExchangerProfileProtocol>)delegate andServiceUUIDStrings:(NSArray*)suuidStrs;
 
 //
 // Change app delegate
