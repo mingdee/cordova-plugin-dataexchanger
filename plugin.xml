@@ -3,9 +3,14 @@
     xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="cordova-plugin-dataexchanger"
-    version="1.0.0">
+    version="1.1.0">
 
-    <name>DxPlugin</name>
+    <engines>
+      <engine name="cordova-plugman" version=">=5.0.0" />
+      <engine name="cordova-android" version=">=5.0.0" />
+    </engines>
+
+    <name>DxPlugin</name> 
     <description>DataExchanger Plugin</description>
     <license>Apache 2.0</license>
     <keywords>bluetooth, BLE, bluetooth low energy, bluetooth smart, DataExchanger, dataexchanger, data exchanger, DX, dx</keywords>
@@ -13,14 +18,11 @@
     <repo>https://github.com/mingdee/cordova-plugin-dataexchanger.git</repo>
     <issue>https://github.com/mingdee/cordova-plugin-dataexchanger/issues</issue>
 
-    <dependency id="cordova-plugin-compat" version="^1.0.0" />
-
     <js-module src="www/dx.js" name="Dx">
         <clobbers target="window.dx" />
     </js-module>
 
     <platform name="ios">
-
         <config-file target="config.xml" parent="/*">
             <feature name="DxPlugin">
                 <param name="ios-package" value="DxPlugin"/>
@@ -53,7 +55,6 @@
 
         <!-- frameworks -->
         <framework src="CoreBluetooth.framework" />
-
     </platform>
 
     <platform name="android">
