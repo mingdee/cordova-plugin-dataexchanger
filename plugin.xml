@@ -68,7 +68,7 @@
         <source-file src="src/android/DataExchangerDevice.java" target-dir="src/com/gttronics/ble" />
 
         <!-- libraries -->
-        <source-file src="src/android/libblelib.jar" target-dir="src/com/gttronics/ble" framework="true" />
+        <resource-file src="src/android/libblelib.jar" target="libs"/>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.BLUETOOTH"/>
