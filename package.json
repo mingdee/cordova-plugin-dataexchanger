@@ -6,12 +6,12 @@
     "id": "cordova-plugin-dataexchanger",
     "platforms": [
       "ios",
-      "android",
+      "android"
     ]
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mingdee/cordova-plugin-dataexchanger.git"
+    "url": "https://github.com/mingdee/cordova-plugin-dataexchanger.git"
   },
   "keywords": [
     "cordova",
@@ -20,18 +20,29 @@
     "bluetoothle",
     "bluetooth le",
     "low energy",
-	"dataexchanger"
-	"data-exchanger"
-	"data exchanger"
+    "dataexchanger",
+    "data-exchanger",
+    "data exchanger",
     "smart",
     "ecosystem:cordova",
     "cordova-ios",
     "cordova-android"
   ],
-  "author": "Ming Leung <ming.@gt-tronics.com>",
+  "author": {
+    "name": "Ming Leung",
+    "email": "ming.@gt-tronics.com"
+  },
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/mingdee/cordova-plugin-dataexchanger/issues"
   },
-  "homepage": "https://github.com/mingdee/cordova-plugin-dataexchanger#readme"
+  "homepage": "https://github.com/mingdee/cordova-plugin-dataexchanger#readme",
+  "readme": "# DataExchanger Plugin for Apache Cordova\n\nThis plugin enables communication between a phone and DataExchanger (BLE) peripherals.\n\nThe plugin provides a simple [JavaScript API](#api) for iOS.\n\n * Scan and connect \n * Send data\n * Send command\n * Receive data (through notification)\n * Receive command (through notification)\n\n## Supported Platforms\n\n* iOS\n\n# Installing\n\n### Cordova\n\n    $ cordova plugin add cordova-plugin-dataexchanger\n\n### PhoneGap\n\n    $ phonegap plugin add cordova-plugin-dataexchanger\n\n### PhoneGap Build\n\nEdit config.xml to install the plugin for [PhoneGap Build](http://build.phonegap.com).\n\n    <gap:plugin name=\"cordova-plugin-dataexchanger\" source=\"npm\" />\n\n\n# API\n\n## Methods\n\n- [dx.isEnabled](#isenabled)\n- [dx.isConnected](#isconnected)\n- [dx.startScan](#startscan)\n- [dx.stopScan](#stopscan)\n- [dx.connect](#connect)\n- [dx.disconnect](#disconnect)\n- [dx.sendData](#senddata)\n- [dx.sendCmd](#sendcmd)\n- [dx.startRxDataNotification](#startrxdatanotification)\n- [dx.stopRxDataNotification](#stoprxdatanotification)\n- [dx.startRxCmdNotification](#startrxcmdnotification)\n- [dx.stopRxCmdNotification](#stoprxcmdnotification)\n- [dx.startTxCreditNotification](#starttxcreditnotification)\n- [dx.stopTxCreditNotification](#stoptxcreditnotification)\n\n\n# License\n\nApache 2.0\n\n# Feedback\n\nTry the code. If you find an problem or missing feature, file an issue or create a pull request.\n\n",
+  "readmeFilename": "README.md",
+  "gitHead": "9b3fe220625be5b3b3cd0bc15c21d9a2001ca8d4",
+  "_id": "cordova-plugin-dataexchanger@1.0.0",
+  "scripts": {},
+  "_shasum": "4e0257e0cdfafcb8fa333124fea4c22d77e401c8",
+  "_from": "plugins/cordova-plugin-dataexchanger",
+  "_resolved": "file:plugins/cordova-plugin-dataexchanger"
 }
