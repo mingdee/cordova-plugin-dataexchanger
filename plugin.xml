@@ -19,7 +19,7 @@
     <issue>https://github.com/mingdee/cordova-plugin-dataexchanger/issues</issue>
 
     <js-module src="www/dx.js" name="Dx">
-        <clobbers target="window.dx" />
+        <clobbers target="cordova.plugin.dx" />
     </js-module>
 
     <platform name="ios">
